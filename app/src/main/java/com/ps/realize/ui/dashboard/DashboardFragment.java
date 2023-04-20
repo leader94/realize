@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
-import com.ps.realize.MainActivity;
 import com.ps.realize.R;
 import com.ps.realize.core.data.LocalData;
 import com.ps.realize.core.interfaces.IKeyboardListener;
@@ -36,13 +35,13 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class DashboardFragment extends Fragment {
-    private static final String TAG = DashboardFragment.class.getSimpleName();
-    KeyboardUtils keyboardUtils = new KeyboardUtils();
+    private final String TAG = DashboardFragment.class.getSimpleName();
+    private final KeyboardUtils keyboardUtils = new KeyboardUtils();
     private FragmentDashboardBinding binding;
     private DashboardViewModel dashboardViewModel;
     private Fragment _this;
     private SearchView searchView;
-    private    LinearLayout llCreateBtn;
+    private LinearLayout llCreateBtn;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -94,18 +93,22 @@ public class DashboardFragment extends Fragment {
             }
         });
 
-       llCreateBtn = binding.dashboardLlCreateBtn;
+        llCreateBtn = binding.dashboardLlCreateBtn;
 
     }
 
-    private void  setOnClickListeners(){
+    private void setOnClickListeners() {
         llCreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CommonService.replaceFragment((AppCompatActivity) getActivity(), R.id.main_fragment_holder, new CreateAddImageFragment(), TAG);
+                CommonService.replaceFragment((AppCompatActivity) getActivity(),
+                        R.id.main_fragment_holder,
+                        new CreateAddImageFragment(),
+                        CreateAddImageFragment.class.getSimpleName());
             }
         });
     }
+
     private void getConfiguration() {
 
         try {
@@ -121,10 +124,11 @@ public class DashboardFragment extends Fragment {
 
                     JSONObject configJSON = JSONUtils.getJSONObject(response);
                     if (configJSON == null) return;
+                    if (getActivity() == null) return;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(dashboardViewModel == null || binding ==  null) return;
+                            if (dashboardViewModel == null || binding == null) return;
                             dashboardViewModel.updateUI(configJSON, binding.dashboardLlSuggestions);
                         }
                     });

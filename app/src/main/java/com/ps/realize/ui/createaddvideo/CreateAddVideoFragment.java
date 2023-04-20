@@ -27,10 +27,14 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.ps.realize.R;
 import com.ps.realize.databinding.FragmentCreateAddVideoBinding;
+import com.ps.realize.utils.CommonService;
 import com.ps.realize.utils.CommonUtils;
+import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.KeyboardUtils;
 import com.ps.realize.utils.MediaUtils;
 
@@ -40,19 +44,22 @@ import java.io.IOException;
 public class CreateAddVideoFragment extends Fragment {
     private final String TAG = CreateAddVideoFragment.class.getSimpleName();
     private final CommonUtils commonUtils = new CommonUtils();
-    ActivityResultLauncher<Uri> videoFromCameraActivity;
-    ActivityResultLauncher<Intent> videoFromLocalStorageActivity;
+    private final Constants constants = new Constants();
+    private ActivityResultLauncher<Uri> videoFromCameraActivity;
+    private ActivityResultLauncher<Intent> videoFromLocalStorageActivity;
     private FragmentCreateAddVideoBinding binding;
     private Fragment _this;
     private ImageView backBtn;
     private EditText etUrl;
-
     private VideoView videoView;
     private MediaController mediaController;
     private Uri cameraVideoUri;
     private LinearLayout llCenter, urlPopUp;
     private RelativeLayout videoContainer;
     private ProgressBar progressBar;
+    private String targetVideoURIString, targetImageURIString;
+
+    private TextView nextBtn;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -63,12 +70,29 @@ public class CreateAddVideoFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        targetImageURIString = getArguments().getString(constants.TARGET_IMAGE_URI);
 
         binding = FragmentCreateAddVideoBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         setViews();
+
+        if (savedInstanceState != null) {
+            // Restore last state for target video.
+            String videoUriString = savedInstanceState.getString(constants.TARGET_VIDEO_URI, null);
+            if (videoUriString != null) {
+                playVideo(Uri.parse(videoUriString));
+            }
+        } else if (targetVideoURIString != null) {
+            playVideo(Uri.parse(targetVideoURIString));
+        }
         return root;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(constants.TARGET_VIDEO_URI, targetVideoURIString);
     }
 
     @Override
@@ -89,9 +113,26 @@ public class CreateAddVideoFragment extends Fragment {
         videoContainer = binding.createAddVideoVideoContainer;
         progressBar = binding.createAddVideoIndeterminateBar;
 
+        nextBtn = binding.createAddVideoNextBtn;
+
         mediaController = new MediaController(getContext());
         mediaController.setAnchorView(videoView);
 
+        nextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CreateAddVideoFragment frag = new CreateAddVideoFragment();
+                Bundle args = new Bundle();
+                args.putString(constants.TARGET_IMAGE_URI, targetImageURIString);
+                args.putString(constants.TARGET_VIDEO_URI, targetVideoURIString);
+                frag.setArguments(args);
+                CommonService.replaceFragment((AppCompatActivity) getActivity(),
+                        R.id.main_fragment_holder,
+                        frag,
+                        frag.getClass().getSimpleName()
+                );
+            }
+        });
 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,12 +213,14 @@ public class CreateAddVideoFragment extends Fragment {
 
     private void playVideo(Uri uri) {
         playVideoPreSetup();
+        targetVideoURIString = String.valueOf(uri);
         videoView.setVideoURI(uri);
 //        videoView.requestFocus();   // commented to allow popup hide softkeyboard
     }
 
     private void playVideo(String path) {
         playVideoPreSetup();
+        targetVideoURIString = String.valueOf(path);
         videoView.setVideoPath(path);
     }
 
@@ -205,7 +248,9 @@ public class CreateAddVideoFragment extends Fragment {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
                 progressBar.setVisibility(View.GONE);
+
                 videoView.start();
+                nextBtn.setVisibility(View.VISIBLE);
             }
         });
 
@@ -213,6 +258,7 @@ public class CreateAddVideoFragment extends Fragment {
             @Override
             public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
                 progressBar.setVisibility(View.GONE);
+                nextBtn.setVisibility(View.INVISIBLE);
                 return false;
             }
         });

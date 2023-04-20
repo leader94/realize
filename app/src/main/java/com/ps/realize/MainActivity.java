@@ -21,7 +21,7 @@ import com.ps.realize.core.datamodels.User;
 import com.ps.realize.core.interfaces.IOnBackPressed;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.ActivityMainBinding;
-import com.ps.realize.ui.createaddvideo.CreateAddVideoFragment;
+import com.ps.realize.ui.dashboard.DashboardFragment;
 import com.ps.realize.utils.CommonService;
 import com.ps.realize.utils.JSONUtils;
 import com.ps.realize.utils.NetworkUtils;
@@ -35,8 +35,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int REQUEST_CAMERA_CODE = 100;
+    private final String TAG = MainActivity.class.getSimpleName();
+    private final int REQUEST_CAMERA_CODE = 100;
     private ActivityMainBinding binding;
     private User user;
     private AppCompatActivity self;
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         getConfiguration();
 
-        CommonService.addFragment(self, R.id.main_fragment_holder, new CreateAddVideoFragment(), TAG);
+        CommonService.addFragment(self, R.id.main_fragment_holder, new DashboardFragment(), DashboardFragment.class.getSimpleName());
     }
 
     @Override
@@ -67,6 +67,13 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_fragment_holder);
         if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
             super.onBackPressed();
+
+            // not needed, keeping for future use maybe
+//            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+//                getSupportFragmentManager().popBackStack();
+//            } else {
+//                super.onBackPressed();
+//            }
         }
     }
 

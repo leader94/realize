@@ -234,37 +234,46 @@
     <LinearLayout
         android:id="@+id/create_add_video_url_popup"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/rect_curved_border"
+        android:clickable="true"
+        android:gravity="center"
         android:orientation="vertical"
-        android:paddingLeft="15dp"
-        android:paddingTop="10dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="10dp"
         android:visibility="gone">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="Enter Image URL"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:textStyle="normal" />
-
-        <EditText
-            android:id="@+id/create_add_video_url_edittext"
-            style="@style/MyEditTextStyle"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="URL"
-            android:imeOptions="actionDone"
-            android:inputType="textUri"
-            android:singleLine="true"
-            android:theme="@style/MySearchViewTheme" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/rect_curved_border"
+            android:orientation="vertical"
+            android:paddingLeft="15dp"
+            android:paddingTop="10dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="Enter Image URL"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="normal" />
+
+            <EditText
+                android:id="@+id/create_add_video_url_edittext"
+                style="@style/MyEditTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="URL"
+                android:imeOptions="actionDone"
+                android:inputType="textUri"
+                android:singleLine="true"
+                android:theme="@style/MySearchViewTheme" />
+
+        </LinearLayout>
 
 
     </LinearLayout>
