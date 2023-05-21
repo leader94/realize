@@ -3,10 +3,9 @@ package com.ps.realize.ui.createaddimage;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -25,7 +24,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -42,9 +40,8 @@ import com.ps.realize.utils.CommonService;
 import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.KeyboardUtils;
 import com.ps.realize.utils.MediaUtils;
-
-import java.io.File;
-import java.io.IOException;
+import com.ps.realize.utils.NetworkUtils;
+import com.ps.realize.utils.SharedMediaUtils;
 
 public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
     private final String TAG = CreateAddImageFragment.class.getSimpleName();
@@ -71,7 +68,6 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
         _this = this;
         attachActivityResultLaunchers();
     }
-
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         CreateAddImageViewModel homeViewModel = new ViewModelProvider(this).get(CreateAddImageViewModel.class);
@@ -107,19 +103,23 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
     }
 
     private void setListeners() {
-        rlForTargetImage = new RequestListener<Drawable>() {
+        rlForTargetImage = new RequestListener<BitmapDrawable>() {
             @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<BitmapDrawable> target, boolean isFirstResource) {
                 createAddImageLL.setVisibility(View.VISIBLE);
                 targetImageView.setVisibility(View.GONE);
                 return false;
             }
 
             @Override
-            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+            public boolean onResourceReady(BitmapDrawable resource, Object model, Target<BitmapDrawable> target, DataSource dataSource, boolean isFirstResource) {
                 createAddImageLL.setVisibility(View.GONE);
                 targetImageView.setVisibility(View.VISIBLE);
                 tvNextBtn.setVisibility(View.VISIBLE);
+                Uri localImageUri = SharedMediaUtils.writeImageFile(getContext(), resource.getBitmap());
+                if (NetworkUtils.isValidUrl(model.toString())) {
+                    targetImageURIString = String.valueOf(localImageUri);
+                }
                 return false;
             }
         };
@@ -164,7 +164,9 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
         llCameraImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                imageFromCameraActivity.launch(getTempCameraImageUri());
+//                imageFromCameraActivity.launch( getTempCameraImageUri());
+                cameraPhotoUri = SharedMediaUtils.createImageFile(getContext());
+                imageFromCameraActivity.launch(cameraPhotoUri);
             }
         });
         llLocalImage.setOnClickListener(new View.OnClickListener() {
@@ -194,9 +196,11 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
         });
     }
 
+    /*
     private Uri getURI(File mediaFile) {
         return FileProvider.getUriForFile(getActivity().getApplicationContext(), getActivity().getPackageName() + ".provider", mediaFile);
     }
+    */
 
     private void attachActivityResultLaunchers() {
         imageFromCameraActivity = registerForActivityResult(new ActivityResultContracts.TakePicture(), new ActivityResultCallback<Boolean>() {
@@ -233,12 +237,15 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
     }
 
     private void setImageIntoImageView(Uri imageUri) {
+
         targetImageView.setVisibility(View.VISIBLE);
         targetImageURIString = String.valueOf(imageUri);
         Glide.with(_this)
                 .load(imageUri)
                 .listener(rlForTargetImage)
                 .into(targetImageView);
+
+
     }
 
     /*
@@ -251,21 +258,27 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
     }
     */
 
+
+    /*
     private Uri getTempCameraImageUri() {
+        ///////////// OLD
         File imagePath = null;
         try {
+            ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
+            File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+            imagePath = new File(directory, "IMG_" + System.currentTimeMillis() + ".jpg");
             imagePath = File.createTempFile(
                     "IMG_",
                     ".jpg",
                     requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             );
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         cameraPhotoUri = getURI(imagePath);
         return cameraPhotoUri;
-
     }
+    */
 
     @Override
     public boolean onBackPressed() {

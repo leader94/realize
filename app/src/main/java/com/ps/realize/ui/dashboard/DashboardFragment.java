@@ -112,10 +112,10 @@ public class DashboardFragment extends Fragment {
     private void getConfiguration() {
 
         try {
-            NetworkUtils.get("/config/home", new NetworkListener() {
+            NetworkUtils.get("/configs/home", new NetworkListener() {
                 @Override
                 public void onFailure(Request request, IOException e) {
-                    Log.e(TAG, "Failed to get user details");
+                    Log.e(TAG, "Failed to get home details");
                 }
 
                 @Override

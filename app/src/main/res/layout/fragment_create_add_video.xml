@@ -249,7 +249,6 @@
             android:background="@drawable/rect_curved_border"
             android:orientation="vertical"
             android:paddingLeft="15dp"
-            android:paddingTop="10dp"
             android:paddingRight="15dp"
             android:paddingBottom="10dp">
 

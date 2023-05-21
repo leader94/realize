@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -31,15 +30,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.ps.realize.R;
+import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentCreateAddVideoBinding;
+import com.ps.realize.ui.upload.UploadFragment;
 import com.ps.realize.utils.CommonService;
 import com.ps.realize.utils.CommonUtils;
 import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.KeyboardUtils;
 import com.ps.realize.utils.MediaUtils;
+import com.ps.realize.utils.NetworkUtils;
+import com.ps.realize.utils.SharedMediaUtils;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class CreateAddVideoFragment extends Fragment {
     private final String TAG = CreateAddVideoFragment.class.getSimpleName();
@@ -69,7 +75,6 @@ public class CreateAddVideoFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         targetImageURIString = getArguments().getString(constants.TARGET_IMAGE_URI);
 
         binding = FragmentCreateAddVideoBinding.inflate(inflater, container, false);
@@ -121,7 +126,7 @@ public class CreateAddVideoFragment extends Fragment {
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CreateAddVideoFragment frag = new CreateAddVideoFragment();
+                UploadFragment frag = new UploadFragment();
                 Bundle args = new Bundle();
                 args.putString(constants.TARGET_IMAGE_URI, targetImageURIString);
                 args.putString(constants.TARGET_VIDEO_URI, targetVideoURIString);
@@ -144,7 +149,10 @@ public class CreateAddVideoFragment extends Fragment {
         llCameraVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                videoFromCameraActivity.launch(getTempCameraVideoUri());
+//                videoFromCameraActivity.launch(getTempCameraVideoUri());
+                cameraVideoUri = SharedMediaUtils.createVideoFile(getContext());
+                videoFromCameraActivity.launch(cameraVideoUri);
+
             }
         });
 
@@ -169,6 +177,7 @@ public class CreateAddVideoFragment extends Fragment {
                     String text = String.valueOf(etUrl.getText());
                     urlPopUp.setVisibility(View.GONE);
                     playVideo(text);
+                    downloadVideo(text); // todo move to async thread
                     return false;  // Intentional to let the soft keyboard close
                 }
                 return false;
@@ -221,6 +230,7 @@ public class CreateAddVideoFragment extends Fragment {
     private void playVideo(String path) {
         playVideoPreSetup();
         targetVideoURIString = String.valueOf(path);
+
         videoView.setVideoPath(path);
     }
 
@@ -251,6 +261,7 @@ public class CreateAddVideoFragment extends Fragment {
 
                 videoView.start();
                 nextBtn.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -264,6 +275,22 @@ public class CreateAddVideoFragment extends Fragment {
         });
     }
 
+    private void downloadVideo(String url) {
+        NetworkUtils.get(url, new NetworkListener() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Response response) {
+                InputStream inputStream = response.body().byteStream();
+                Uri localVideoUri = SharedMediaUtils.writeVideoFile(getContext(), inputStream);
+                targetVideoURIString = String.valueOf(localVideoUri);
+            }
+        });
+
+    }
+    /*
     private Uri getTempCameraVideoUri() {
         File imagePath = null;
         try {
@@ -279,4 +306,5 @@ public class CreateAddVideoFragment extends Fragment {
         return cameraVideoUri;
 
     }
+    */
 }

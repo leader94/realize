@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentTransaction;
 public class CommonService {
     private static final String TAG = CommonService.class.getSimpleName();
 
+    public static String APP_NAME = "Realise";
     public static boolean bARSupported = false;
     public static boolean bARInstalled = false;
 

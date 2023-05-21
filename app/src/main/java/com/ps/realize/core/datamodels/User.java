@@ -10,7 +10,9 @@ public class User {
     private String mobile;
     private String countryCode;
     private String profilePhoto;
+    private String token;
     private onUserObjectUpdate _updateListener;
+
 
     public User() {
 
@@ -80,6 +82,14 @@ public class User {
 
     public void setObjectUpdateListener(onUserObjectUpdate listener) {
         _updateListener = listener;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public interface onUserObjectUpdate {

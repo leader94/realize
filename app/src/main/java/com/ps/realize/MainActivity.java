@@ -1,21 +1,18 @@
 package com.ps.realize;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.anggrayudi.storage.file.DocumentFileCompat;
 import com.google.ar.core.ArCoreApk;
-import com.nabinbhandari.android.permissions.PermissionHandler;
-import com.nabinbhandari.android.permissions.Permissions;
 import com.ps.realize.core.data.LocalData;
 import com.ps.realize.core.datamodels.User;
 import com.ps.realize.core.interfaces.IOnBackPressed;
@@ -29,7 +26,6 @@ import com.ps.realize.utils.NetworkUtils;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -60,6 +56,10 @@ public class MainActivity extends AppCompatActivity {
         getConfiguration();
 
         CommonService.addFragment(self, R.id.main_fragment_holder, new DashboardFragment(), DashboardFragment.class.getSimpleName());
+
+        DocumentFileCompat.getAccessibleAbsolutePaths(getApplicationContext());
+
+
     }
 
     @Override
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getConfiguration() {
         try {
-            NetworkUtils.get("/user/12466434534", new NetworkListener() {
+            NetworkUtils.get("/users/1ef59618-63a6-4f75-90ca-256c0c7b3efe", new NetworkListener() {
                 @Override
                 public void onFailure(Request request, IOException e) {
                     Log.e(TAG, "Failed to get user details");
@@ -117,29 +117,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-    }
-
-    private void checkAndroidPermissions() {
-        //
-        String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-//        String rationale = "Please provide location permission so that you can ...";
-//
-//        Permissions.Options options = new Permissions.Options()
-//                .setRationaleDialogTitle("Info")
-//                .setSettingsDialogTitle("Warning");
-
-        Permissions.check(this, permissions, null, null, new PermissionHandler() {
-            @Override
-            public void onGranted() {
-                // do your task.
-                Toast.makeText(MainActivity.this, "Camera+Storage granted.", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onDenied(Context context, ArrayList<String> deniedPermissions) {
-                // permission denied, block the feature.
-            }
-        });
     }
 
     private void addPermissions() {
