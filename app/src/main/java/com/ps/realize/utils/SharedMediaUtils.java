@@ -32,7 +32,7 @@ public class SharedMediaUtils {
         ContentValues newImageDetails = new ContentValues();
         newImageDetails.put(MediaStore.Images.Media.DISPLAY_NAME,
                 "IMG_" + System.currentTimeMillis() + ".jpg");
-        String folderPath = Environment.DIRECTORY_PICTURES + File.separator + CommonService.APP_NAME;
+        String folderPath = Environment.DIRECTORY_PICTURES + File.separator + FragmentUtils.APP_NAME;
         newImageDetails.put(MediaStore.MediaColumns.RELATIVE_PATH, folderPath);
 
         // Keep a handle to the new image's URI in case you need to modify it
@@ -58,7 +58,7 @@ public class SharedMediaUtils {
         ContentValues newVideoDetails = new ContentValues();
         newVideoDetails.put(MediaStore.Video.Media.DISPLAY_NAME,
                 "VID_" + System.currentTimeMillis() + ".mp4");
-        String folderPath = Environment.DIRECTORY_MOVIES + File.separator + CommonService.APP_NAME;
+        String folderPath = Environment.DIRECTORY_MOVIES + File.separator + FragmentUtils.APP_NAME;
         newVideoDetails.put(MediaStore.MediaColumns.RELATIVE_PATH, folderPath);
 
         // Keep a handle to the new image's URI in case you need to modify it

@@ -9,8 +9,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-public class CommonService {
-    private static final String TAG = CommonService.class.getSimpleName();
+public class FragmentUtils {
+    private static final String TAG = FragmentUtils.class.getSimpleName();
 
     public static String APP_NAME = "Realise";
     public static boolean bARSupported = false;
@@ -55,4 +55,17 @@ public class CommonService {
         transaction.commit();
     }
 
+    public static void popFragmentsTillName(AppCompatActivity activity, String name) {
+        FragmentManager manager = activity.getSupportFragmentManager();
+        manager.popBackStack(name, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+//        int count = manager.getBackStackEntryCount();
+//        int id = manager.getBackStackEntryAt(count).getId();
+//        manager.popBackStack(id, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    public static void popAllFragments(AppCompatActivity activity) {
+        FragmentManager manager = activity.getSupportFragmentManager();
+        manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
 }

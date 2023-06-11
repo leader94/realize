@@ -11,9 +11,11 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -28,8 +30,9 @@ import okio.Source;
 
 public class NetworkUtils {
 
+    public static final String authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ijc0ZjI4ODM5LTY0ZGItNGUyZi1hZDU0LTk2NDdiMzgwODk0ZCIsImlhdCI6MTY4NTg2NDIzOSwiZXhwIjoxNjkzNjQwMjM5fQ.d8dFA9Zf6vCseNA_bfM6qK7WGc2dQPFt1QxgdEpQx2A";
     //    static final String BASEURL = "https://apimocha.com/testingapprealise";
-    static final String BASEURL = "http://192.168.1.46:3000";
+    static final String BASEURL = "http://192.168.1.42:3000";
     static OkHttpClient client = new OkHttpClient();
 
     private static String getIp() {
@@ -66,11 +69,11 @@ public class NetworkUtils {
         });
     }
 
-    public static void get(String url, NetworkListener listener) {
-        getWithToken(url, null, listener);
+    public static void get(String url, Map<String, String> params, NetworkListener listener) {
+        getWithToken(url, params, null, listener);
     }
 
-    public static void getWithToken(String url, String token, NetworkListener listener) {
+    public static void getWithToken(String url, Map<String, String> params, String token, NetworkListener listener) {
 //        Request request = new Request.Builder()
 //                .url(BASEURL + url)
 //                .build();
@@ -80,9 +83,17 @@ public class NetworkUtils {
 //                    .addHeader("Authorization", "Bearer " + token)
 //                    .build();
 //        }
-        Request.Builder reqBuilder = new Request
-                .Builder()
-                .url(isValidUrl(url) ? url : BASEURL + url);
+
+        HttpUrl.Builder httpBuilder = HttpUrl.parse(isValidUrl(url) ? url : BASEURL + url).newBuilder();
+        if (params != null) {
+            for (Map.Entry<String, String> param : params.entrySet()) {
+                httpBuilder.addQueryParameter(param.getKey(), param.getValue());
+            }
+        }
+        Request.Builder reqBuilder = new Request.Builder().url(httpBuilder.build());
+//        Request.Builder reqBuilder = new Request
+//                .Builder()
+//                .url(isValidUrl(url) ? url : BASEURL + url);
 
         if (token != null) {
             reqBuilder.addHeader("Authorization", "Bearer " + token);

@@ -33,9 +33,8 @@ import com.ps.realize.R;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentCreateAddVideoBinding;
 import com.ps.realize.ui.upload.UploadFragment;
-import com.ps.realize.utils.CommonService;
-import com.ps.realize.utils.CommonUtils;
 import com.ps.realize.utils.Constants;
+import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.KeyboardUtils;
 import com.ps.realize.utils.MediaUtils;
 import com.ps.realize.utils.NetworkUtils;
@@ -49,7 +48,6 @@ import okhttp3.Response;
 
 public class CreateAddVideoFragment extends Fragment {
     private final String TAG = CreateAddVideoFragment.class.getSimpleName();
-    private final CommonUtils commonUtils = new CommonUtils();
     private final Constants constants = new Constants();
     private ActivityResultLauncher<Uri> videoFromCameraActivity;
     private ActivityResultLauncher<Intent> videoFromLocalStorageActivity;
@@ -131,7 +129,7 @@ public class CreateAddVideoFragment extends Fragment {
                 args.putString(constants.TARGET_IMAGE_URI, targetImageURIString);
                 args.putString(constants.TARGET_VIDEO_URI, targetVideoURIString);
                 frag.setArguments(args);
-                CommonService.replaceFragment((AppCompatActivity) getActivity(),
+                FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
                         R.id.main_fragment_holder,
                         frag,
                         frag.getClass().getSimpleName()
@@ -276,7 +274,7 @@ public class CreateAddVideoFragment extends Fragment {
     }
 
     private void downloadVideo(String url) {
-        NetworkUtils.get(url, new NetworkListener() {
+        NetworkUtils.get(url, null, new NetworkListener() {
             @Override
             public void onFailure(Request request, IOException e) {
             }

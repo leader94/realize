@@ -17,12 +17,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.ps.realize.R;
+import com.ps.realize.core.SceneFragment;
 import com.ps.realize.core.data.LocalData;
 import com.ps.realize.core.interfaces.IKeyboardListener;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentDashboardBinding;
 import com.ps.realize.ui.createaddimage.CreateAddImageFragment;
-import com.ps.realize.utils.CommonService;
+import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.JSONUtils;
 import com.ps.realize.utils.KeyboardUtils;
 import com.ps.realize.utils.NetworkUtils;
@@ -95,13 +96,25 @@ public class DashboardFragment extends Fragment {
 
         llCreateBtn = binding.dashboardLlCreateBtn;
 
+
     }
 
     private void setOnClickListeners() {
+        LinearLayout scannerBtn = binding.dashboardLlScannerBtn;
+        scannerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
+                        R.id.main_fragment_holder,
+                        new SceneFragment(),
+                        SceneFragment.class.getSimpleName());
+            }
+        });
+
         llCreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CommonService.replaceFragment((AppCompatActivity) getActivity(),
+                FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
                         R.id.main_fragment_holder,
                         new CreateAddImageFragment(),
                         CreateAddImageFragment.class.getSimpleName());
@@ -112,7 +125,7 @@ public class DashboardFragment extends Fragment {
     private void getConfiguration() {
 
         try {
-            NetworkUtils.get("/configs/home", new NetworkListener() {
+            NetworkUtils.get("/configs/home", null, new NetworkListener() {
                 @Override
                 public void onFailure(Request request, IOException e) {
                     Log.e(TAG, "Failed to get home details");

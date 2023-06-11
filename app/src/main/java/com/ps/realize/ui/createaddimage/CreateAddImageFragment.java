@@ -36,8 +36,8 @@ import com.ps.realize.R;
 import com.ps.realize.core.interfaces.IOnBackPressed;
 import com.ps.realize.databinding.FragmentCreateAddImageBinding;
 import com.ps.realize.ui.createaddvideo.CreateAddVideoFragment;
-import com.ps.realize.utils.CommonService;
 import com.ps.realize.utils.Constants;
+import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.KeyboardUtils;
 import com.ps.realize.utils.MediaUtils;
 import com.ps.realize.utils.NetworkUtils;
@@ -154,7 +154,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
                 Bundle args = new Bundle();
                 args.putString(constants.TARGET_IMAGE_URI, targetImageURIString);
                 frag.setArguments(args);
-                CommonService.replaceFragment((AppCompatActivity) getActivity(),
+                FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
                         R.id.main_fragment_holder,
                         frag,
                         CreateAddVideoFragment.class.getSimpleName());
@@ -237,7 +237,6 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
     }
 
     private void setImageIntoImageView(Uri imageUri) {
-
         targetImageView.setVisibility(View.VISIBLE);
         targetImageURIString = String.valueOf(imageUri);
         Glide.with(_this)
@@ -248,15 +247,6 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
 
     }
 
-    /*
-    private void setImageIntoImageView(Bitmap selectedImage) {
-        targetImageView.setVisibility(View.VISIBLE);
-        Glide.with(_this)
-                .load(selectedImage)
-                .listener(rlForTargetImage)
-                .into(targetImageView);
-    }
-    */
 
 
     /*

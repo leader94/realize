@@ -7,5 +7,6 @@ import okhttp3.Response;
 
 public interface NetworkListener {
     void onFailure(Request request, IOException e);
+
     void onResponse(Response response);
 }

@@ -14,13 +14,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.ps.realize.core.data.LocalData;
+import com.ps.realize.core.datamodels.json.ProjectObj;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentUploadBinding;
+import com.ps.realize.ui.createaddimage.CreateAddImageFragment;
 import com.ps.realize.utils.Constants;
+import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.JSONUtils;
 import com.ps.realize.utils.KeyboardUtils;
 import com.ps.realize.utils.MediaUtils;
@@ -31,6 +35,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -82,6 +87,8 @@ public class UploadFragment extends Fragment {
             @Override
             public void onClick(View view) {
 // todo popback stack and redirect to dashboard
+                FragmentUtils.popFragmentsTillName((
+                        AppCompatActivity) getActivity(), CreateAddImageFragment.class.getSimpleName());
             }
         });
 
@@ -175,6 +182,25 @@ public class UploadFragment extends Fragment {
     }
 
     private String _getRequestBody() {
+
+        ArrayList<ProjectObj> projects = LocalData.curUser.getProjects();
+
+        ProjectObj firstProject = null;
+        String projectId = null;
+        try {
+            firstProject = projects.get(0);
+//                    projects.getJSONObject(0); // TODO update this
+            projectId = firstProject.getId();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (firstProject == null) {
+            Log.e(TAG, "FIRST PROJECT NOT FOUND");
+            return "";
+        }
+
         Uri baseUri = Uri.parse(targetImageURIString);
         String baseFileExtn = MediaUtils.getMimeType(getContext(), baseUri);
         String baseFileName = MediaUtils.getFileName(getContext(), baseUri);
@@ -203,6 +229,7 @@ public class UploadFragment extends Fragment {
 
             reqBody.put("base", baseOptions);
             reqBody.put("overlay", overlayOptions);
+            reqBody.put("projectId", projectId);
             return reqBody.toString();
 
         } catch (Exception e) {
@@ -251,7 +278,7 @@ public class UploadFragment extends Fragment {
     private int getTotalUplaodProgress() {
         if ((baseUploadProg + overlayUploadProg) == 0) {
             return 0;
-        } else return (int) (100 * (baseUploadProg + overlayUploadProg) / 200);
+        } else return 100 * (baseUploadProg + overlayUploadProg) / 200;
     }
 
 }

@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -127,5 +130,20 @@ public class MediaUtils {
             }
         }
         return result;
+    }
+
+    public static Bitmap getBitmap(Context context, Uri imageUri) {
+        Bitmap bitmap = null;
+        try {
+            if (Build.VERSION.SDK_INT < 28) {
+                bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
+            } else {
+                ImageDecoder.Source source = ImageDecoder.createSource(context.getContentResolver(), imageUri);
+                bitmap = ImageDecoder.decodeBitmap(source);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bitmap;
     }
 }

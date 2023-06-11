@@ -14,15 +14,34 @@ import androidx.fragment.app.Fragment;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException;
 import com.ps.realize.R;
+import com.ps.realize.core.data.LocalData;
+import com.ps.realize.core.datamodels.ar.ImageMapping;
+import com.ps.realize.core.datamodels.ar.ImageObj;
+import com.ps.realize.core.datamodels.ar.VideoObj;
+import com.ps.realize.core.datamodels.json.BaseObj;
+import com.ps.realize.core.datamodels.json.OverlayObj;
+import com.ps.realize.core.datamodels.json.ProjectObj;
+import com.ps.realize.core.datamodels.json.SceneObj;
 import com.ps.realize.databinding.FragmentScanBinding;
-import com.ps.realize.utils.CommonService;
+import com.ps.realize.utils.Constants;
+import com.ps.realize.utils.FragmentUtils;
+import com.ps.realize.utils.JSONUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+// TODO remove view from this fragment and convert it to a wrapper that handles only logics and does not have a view
+
+/**
+ * This fragment is meant to contain the app logic , passing appropriate data to the MyARFragment
+ */
 public class SceneFragment extends Fragment {
     private static final String TAG = SceneFragment.class.getSimpleName();
-
-    private FragmentScanBinding binding;
+    private final Constants constants = new Constants();
     MyARFragment myARFragment;
+    private FragmentScanBinding binding;
     private boolean mUserRequestedInstall = true;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +73,15 @@ public class SceneFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Log.i(TAG, "inside onViewCreated");
         checkARInstalled();
-        if (CommonService.bARSupported && CommonService.bARInstalled) {
+        if (FragmentUtils.bARSupported && FragmentUtils.bARInstalled) {
             myARFragment = new MyARFragment();
+            List<ImageMapping> imageMappingList = getImageMappings();
+            if (imageMappingList != null) {
+                String imageMappingListJSONString = JSONUtils.getGsonParser().toJson(imageMappingList);
+                Bundle args = new Bundle();
+                args.putString(constants.IMAGE_MAPPING_LIST, imageMappingListJSONString);
+                myARFragment.setArguments(args);
+            }
             getChildFragmentManager().beginTransaction().add(R.id.arFragmentHolder, myARFragment).commit();
         }
 
@@ -63,7 +89,6 @@ public class SceneFragment extends Fragment {
 
 
     }
-
 
 
     @Override
@@ -79,11 +104,11 @@ public class SceneFragment extends Fragment {
 
     void checkARInstalled() {
         try {
-            if (CommonService.bARSupported) {
+            if (FragmentUtils.bARSupported) {
                 switch (ArCoreApk.getInstance().requestInstall(getActivity(), mUserRequestedInstall)) {
                     case INSTALLED:
                         // Success: Safe to create the AR session.
-                        CommonService.bARInstalled = true;
+                        FragmentUtils.bARInstalled = true;
                         break;
                     case INSTALL_REQUESTED:
                         // When this method returns `INSTALL_REQUESTED`:
@@ -112,5 +137,37 @@ public class SceneFragment extends Fragment {
     void initialiseViewsItems(View view) {
 
     }
+
+    List<ImageMapping> getImageMappings() {
+
+        List<ImageMapping> imageMappingList = new ArrayList();
+        ProjectObj project = LocalData.curProject;
+
+        try {
+            List<SceneObj> scenes = project.getScenes();
+            scenes.forEach((scene) -> {
+                OverlayObj overlayObj = scene.getOverlays().get(0);
+                BaseObj baseObj = scene.getBases().get(0);
+                ImageObj image = new ImageObj(baseObj.getId(),
+                        baseObj.getUploadUrl() + "/" + baseObj.getFileName(),
+                        baseObj.getLocalPath());
+                VideoObj video = new VideoObj(overlayObj.getId(),
+                        overlayObj.getUploadUrl() + "/" + overlayObj.getFileName(),
+                        overlayObj.getLocalPath());
+                List<VideoObj> videoList = new ArrayList<>();
+                videoList.add(video);
+                ImageMapping imageMapping = new ImageMapping(videoList, image);
+                imageMappingList.add(imageMapping);
+                Log.i(TAG, "BBB: adding image " + image.getUrl());
+            });
+
+//            SceneObj scene = scenes.get(0);
+
+        } catch (Exception e) {
+            Log.e(TAG, " Failed getting ImageMappings ", e);
+        }
+        return imageMappingList;
+    }
+
 
 }

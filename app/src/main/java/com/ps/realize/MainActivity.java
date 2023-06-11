@@ -11,21 +11,21 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.anggrayudi.storage.file.DocumentFileCompat;
 import com.google.ar.core.ArCoreApk;
+import com.google.gson.Gson;
 import com.ps.realize.core.data.LocalData;
 import com.ps.realize.core.datamodels.User;
 import com.ps.realize.core.interfaces.IOnBackPressed;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.ActivityMainBinding;
 import com.ps.realize.ui.dashboard.DashboardFragment;
-import com.ps.realize.utils.CommonService;
-import com.ps.realize.utils.JSONUtils;
+import com.ps.realize.utils.CommonAppUtils;
+import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.NetworkUtils;
 
-import org.json.JSONObject;
-
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -55,9 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         getConfiguration();
 
-        CommonService.addFragment(self, R.id.main_fragment_holder, new DashboardFragment(), DashboardFragment.class.getSimpleName());
-
-        DocumentFileCompat.getAccessibleAbsolutePaths(getApplicationContext());
+        FragmentUtils.addFragment(self, R.id.main_fragment_holder, new DashboardFragment(), DashboardFragment.class.getSimpleName());
 
 
     }
@@ -91,28 +89,44 @@ public class MainActivity extends AppCompatActivity {
         }
         if (availability.isSupported()) {
             Log.i("MyTag", "bARSupported true");
-            CommonService.bARSupported = true;
+            FragmentUtils.bARSupported = true;
         } else { // The device is unsupported or unknown.
-            CommonService.bARSupported = false;
+            FragmentUtils.bARSupported = false;
         }
     }
 
     private void getConfiguration() {
         try {
-            NetworkUtils.get("/users/1ef59618-63a6-4f75-90ca-256c0c7b3efe", new NetworkListener() {
-                @Override
-                public void onFailure(Request request, IOException e) {
-                    Log.e(TAG, "Failed to get user details");
-                }
+            Map<String, String> queryParams = new HashMap<>();
+            queryParams.put("details", "true");
 
-                @Override
-                public void onResponse(Response response) {
-                    JSONObject userJSON = JSONUtils.getJSONObject(response);
-                    if (userJSON == null) return;
-                    LocalData.curUser.setUserObject(userJSON);
+            NetworkUtils.getWithToken("/users/74f28839-64db-4e2f-ad54-9647b380894d", queryParams,
+                    NetworkUtils.authToken,
+                    new NetworkListener() {
+                        @Override
+                        public void onFailure(Request request, IOException e) {
+                            Log.e(TAG, "Failed to get user details");
+                        }
 
-                }
-            });
+                        @Override
+                        public void onResponse(Response response) {
+//                            JSONObject userJSON = JSONUtils.getJSONObject(response);
+
+                            try {
+                                String userJSONStr = response.body().string();
+                                if (userJSONStr == null) return;
+                                Gson gson = new Gson();
+                                User user = gson.fromJson(userJSONStr, User.class);
+                                LocalData.curUser = user;
+                                LocalData.curUser.setToken(NetworkUtils.authToken);
+                                CommonAppUtils.setDefaultProject();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+
+                        }
+                    });
         } catch (Exception e) {
             e.printStackTrace();
         }
