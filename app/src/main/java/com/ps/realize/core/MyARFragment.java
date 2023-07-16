@@ -66,16 +66,11 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
     private static final String TAG = MyARFragment.class.getSimpleName();
     private final List<CompletableFuture<Void>> futures = new ArrayList<>();
     private final Constants constants = new Constants();
-    private final boolean imageDetected = false;
     private final Map<String, MapDetails> _map = new HashMap<>();
-    //    private ImageObj imageToBeTracked;
-//    private VideoObj videoToBePlayed;
-    //    private ImageMapping imageMapping;
     private List<ImageMapping> imageMappingList;
     private AugmentedImageDatabase database;
     private Renderable plainVideoModel;
     private Material plainVideoMaterial;
-//    private MediaPlayer mediaPlayer;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,16 +92,11 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
         String imageMappingJSONString = args.getString(constants.IMAGE_MAPPING_LIST);
         if (imageMappingJSONString != null) {
             Gson gson = new Gson();
-//            imageMapping = gson.fromJson(imageMappingJSONString, ImageMapping.class);
-
             Type userListType = new TypeToken<ArrayList<ImageMapping>>() {
             }.getType();
             imageMappingList = gson.fromJson(imageMappingJSONString, userListType);
 
             createMap();
-//            imageToBeTracked = imageMapping.getImage();
-//            List<VideoObj> videos = imageMapping.getVideos();
-//            videoToBePlayed = videos.get(0);
         }
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -435,7 +425,7 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
     private void createMap() {
         for (ImageMapping imageMapping : imageMappingList) {
             ImageObj imageObj = imageMapping.getImage();
-            MapDetails mapDetails = new MapDetails(false, imageMapping.getType(), imageMapping.getVideos());
+            MapDetails mapDetails = new MapDetails(imageMapping.getType(), imageMapping.getVideos());
             _map.put(imageObj.getId(), mapDetails);
         }
     }
@@ -447,9 +437,8 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
 
         MediaPlayer mediaPlayer;
 
-        MapDetails(boolean tracked, String type, List<VideoObj> videos) {
+        MapDetails(String type, List<VideoObj> videos) {
             this.type = type;
-            this.tracked = tracked;
             this.videos = videos;
         }
     }

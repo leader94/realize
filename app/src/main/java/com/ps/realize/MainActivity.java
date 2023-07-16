@@ -33,6 +33,8 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
     private final int REQUEST_CAMERA_CODE = 100;
+    
+
     private ActivityMainBinding binding;
     private User user;
     private AppCompatActivity self;
@@ -136,9 +138,10 @@ public class MainActivity extends AppCompatActivity {
     private void addPermissions() {
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{
-                    Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE
+                    Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE, Manifest.permission.POST_NOTIFICATIONS
             }, REQUEST_CAMERA_CODE);
         }
+
 
     }
 }

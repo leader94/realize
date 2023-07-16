@@ -30,7 +30,7 @@ import okio.Source;
 
 public class NetworkUtils {
 
-    public static final String authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ijc0ZjI4ODM5LTY0ZGItNGUyZi1hZDU0LTk2NDdiMzgwODk0ZCIsImlhdCI6MTY4NTg2NDIzOSwiZXhwIjoxNjkzNjQwMjM5fQ.d8dFA9Zf6vCseNA_bfM6qK7WGc2dQPFt1QxgdEpQx2A";
+    public static final String authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ijc0ZjI4ODM5LTY0ZGItNGUyZi1hZDU0LTk2NDdiMzgwODk0ZCIsImlhdCI6MTY4NzMwOTI0MywiZXhwIjoxNjk1MDg1MjQzfQ.6-1tjCG_rDO3TjChHbiB0Cf5ww53HZd1IxE-bbsah-A";
     //    static final String BASEURL = "https://apimocha.com/testingapprealise";
     static final String BASEURL = "http://192.168.1.42:3000";
     static OkHttpClient client = new OkHttpClient();

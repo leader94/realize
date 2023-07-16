@@ -32,6 +32,10 @@ android {
 }
 
 dependencies {
+    implementation "net.gotev:uploadservice:4.7.0"
+    implementation "net.gotev:uploadservice-okhttp:4.7.0"
+
+
     implementation "com.google.android.filament:filamat-android:1.21.1"
     implementation "com.gorisse.thomas.sceneform:sceneform:1.21.0"
     implementation("com.squareup.okhttp3:okhttp:4.10.0")

@@ -30,6 +30,7 @@ import com.ps.realize.utils.KeyboardUtils;
 import com.ps.realize.utils.MediaUtils;
 import com.ps.realize.utils.NetworkUtils;
 import com.ps.realize.utils.ProgressRequestBody;
+import com.ps.realize.utils.UploadServiceUtils;
 
 import org.json.JSONObject;
 
@@ -164,17 +165,20 @@ public class UploadFragment extends Fragment {
             InputStream overlayInputStream = resolver.openInputStream(overlayUri);
             String overlayFileName = overlay.getString("originalName");
             String overlayMimeType = overlay.getString("originalExtn");
-            NetworkUtils.postWithMultipart(overlayUploadUrl, overlayFormFields, overlayInputStream, overlayFileName, overlayMimeType, new NetworkListener() {
-                @Override
-                public void onFailure(Request request, IOException e) {
-                    Log.e(TAG, "Failed to upload overlay to " + baseUploadUrl);
-                }
 
-                @Override
-                public void onResponse(Response response) {
-                    Log.i(TAG, "Successfully uploaded overlay to " + overlayUploadUrl);
-                }
-            }, getOverlayUploadProgListener());
+            UploadServiceUtils.multiPartUpload(getContext(), overlayUploadUrl, overlayFormFields, overlayUriString, overlayFileName, overlayMimeType);
+
+//            NetworkUtils.postWithMultipart(overlayUploadUrl, overlayFormFields, overlayInputStream, overlayFileName, overlayMimeType, new NetworkListener() {
+//                @Override
+//                public void onFailure(Request request, IOException e) {
+//                    Log.e(TAG, "Failed to upload overlay to " + baseUploadUrl);
+//                }
+//
+//                @Override
+//                public void onResponse(Response response) {
+//                    Log.i(TAG, "Successfully uploaded overlay to " + overlayUploadUrl);
+//                }
+//            }, getOverlayUploadProgListener());
         } catch (Exception e) {
             e.printStackTrace();
         }
