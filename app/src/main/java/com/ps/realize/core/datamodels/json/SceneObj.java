@@ -7,6 +7,8 @@ public class SceneObj {
     List<OverlayObj> overlays;
     List<BaseObj> bases;
 
+    boolean isLocal = true;
+
     public SceneObj(String id, List<OverlayObj> overlay, List<BaseObj> base) {
         this.id = id;
         this.overlays = overlay;

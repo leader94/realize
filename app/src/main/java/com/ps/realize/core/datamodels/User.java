@@ -1,11 +1,22 @@
 package com.ps.realize.core.datamodels;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.ps.realize.core.daos.Converters;
 import com.ps.realize.core.datamodels.json.ProjectObj;
 
 import java.util.ArrayList;
 
+@Entity
 public class User {
 
+    @PrimaryKey
+    @NonNull
+    private String id;
     private String name;
     private String firstName;
     private String lastName;
@@ -13,22 +24,26 @@ public class User {
     private String countryCode;
     private String profilePhoto;
     private String token;
+
+    @Ignore
     private onUserObjectUpdate _updateListener;
 
+    @TypeConverters({Converters.class})
     private ArrayList<ProjectObj> projects;
 
     public User() {
     }
 
     public User(User obj) {
-        this(obj.name, obj.firstName, obj.lastName,
+        this(obj.id, obj.name, obj.firstName, obj.lastName,
                 obj.mobile, obj.countryCode, obj.profilePhoto,
                 obj.token, obj._updateListener, obj.projects);
     }
 
-    public User(String name, String firstName, String lastName,
+    public User(String id, String name, String firstName, String lastName,
                 String mobile, String countryCode, String profilePhoto,
                 String token, onUserObjectUpdate _updateListener, ArrayList<ProjectObj> projects) {
+        this.id = id;
         this.name = name;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -40,21 +55,13 @@ public class User {
         this.projects = projects;
     }
 
-//    public void setUserObject(JSONObject userJSON) {
-//        try {
-//            this.name = userJSON.getString("name");
-//            this.firstName = userJSON.getString("firstName");
-//            this.lastName = userJSON.getString("lastName");
-//            this.mobile = userJSON.getString("mobile");
-//            this.countryCode = userJSON.getString("countryCode");
-//            this.profilePhoto = userJSON.getString("profilePhoto");
-//            this.projects = userJSON.getJSONArray("projects");
-//            _updateListener.onUpdate(this);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -118,6 +125,10 @@ public class User {
 
     public ArrayList<ProjectObj> getProjects() {
         return this.projects;
+    }
+
+    public void setProjects(ArrayList<ProjectObj> projectObj) {
+        this.projects = projectObj;
     }
 
     public interface onUserObjectUpdate {

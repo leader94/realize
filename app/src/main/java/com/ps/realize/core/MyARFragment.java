@@ -202,7 +202,7 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
                     // Every image has to have its own unique String identifier
                     database.addImage(imageToBeTracked.getId(), targetBmp);
                     config.setAugmentedImageDatabase(database);
-                    Log.i(TAG, "BBB: adding image " + imageToBeTracked.getId());
+                    Log.i(TAG, "BBB: LocalUrl adding image " + imageToBeTracked.getId());
                     // Check for image detection
                     setOnAugmentedImageUpdateListener(MyARFragment.this::onAugmentedImageTrackingUpdate);
                 }
@@ -221,7 +221,7 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
                                 // Every image has to have its own unique String identifier
                                 database.addImage(imageToBeTracked.getId(), matrixImage);
                                 config.setAugmentedImageDatabase(database);
-                                Log.i(TAG, "BBB: adding image " + imageToBeTracked.getId());
+                                Log.i(TAG, "BBB: URL adding image " + imageToBeTracked.getId());
                                 // Check for image detection
                                 setOnAugmentedImageUpdateListener(MyARFragment.this::onAugmentedImageTrackingUpdate);
                                 session.configure(config);

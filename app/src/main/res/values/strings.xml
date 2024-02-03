@@ -5,4 +5,8 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_scan">Scan</string>
 
+
+    <!-- CUSTOM STRINGS   -->
+    <string name="user_id">UserId</string>
+
 </resources>

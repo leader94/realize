@@ -1,4 +1,4 @@
-package com.ps.realize.ui.upload;
+package com.ps.realize.ui.dashboard.upload;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -18,11 +18,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.ps.realize.AppDatabase;
+import com.ps.realize.core.daos.user.UserDao;
 import com.ps.realize.core.data.LocalData;
+import com.ps.realize.core.datamodels.api.PostSignedLinkDM;
+import com.ps.realize.core.datamodels.api.UploadFileDetails;
+import com.ps.realize.core.datamodels.json.BaseObj;
+import com.ps.realize.core.datamodels.json.OverlayObj;
 import com.ps.realize.core.datamodels.json.ProjectObj;
+import com.ps.realize.core.datamodels.json.SceneObj;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentUploadBinding;
 import com.ps.realize.ui.createaddimage.CreateAddImageFragment;
+import com.ps.realize.utils.CommonAppUtils;
 import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.JSONUtils;
@@ -37,6 +45,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -60,7 +69,6 @@ public class UploadFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         _this = this;
-
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -105,11 +113,18 @@ public class UploadFragment extends Fragment {
     }
 
     private void _getURLAndUpload() {
-        String uploadReqBody = _getRequestBody();
-        NetworkUtils.postWithToken("/signedlink", uploadReqBody, LocalData.curUser.getToken(), new NetworkListener() {
+        PostSignedLinkDM uploadReqBody = _getRequestBody();
+
+//        String uploadReqBodyStr = uploadReqBody.toString();
+        String uploadReqBodyStr = JSONUtils.getGsonParser().toJson(uploadReqBody);
+
+        NetworkUtils.postWithToken("/signedlink", uploadReqBodyStr, LocalData.curUser.getToken(), new NetworkListener() {
             @Override
             public void onFailure(Request request, IOException e) {
                 e.printStackTrace();
+                // handle failure and make uploadPending true
+                // save mockResponse in project scene
+                _handleUploadFailure(uploadReqBody);
             }
 
             @Override
@@ -185,7 +200,46 @@ public class UploadFragment extends Fragment {
 
     }
 
-    private String _getRequestBody() {
+
+    private void _handleUploadFailure(PostSignedLinkDM uploadReqBody) {
+        ProjectObj curProject = LocalData.curProject;
+        List<SceneObj> sceneObjList = curProject.getScenes();
+
+        UploadFileDetails baseDetails = uploadReqBody.getBase();
+        UploadFileDetails overlayDetails = uploadReqBody.getOverlay();
+
+        BaseObj baseObj = new BaseObj("dummyBId-" + CommonAppUtils.generateUuid(),
+                baseDetails.getFileName(),
+                baseDetails.getLocalPath().toString(),
+                baseDetails.getFileName(),
+                null,
+                null,
+                true
+
+        );
+        OverlayObj overlayObj = new OverlayObj("dummyOlId-" + CommonAppUtils.generateUuid(),
+                overlayDetails.getFileName(),
+                overlayDetails.getLocalPath().toString(),
+                overlayDetails.getFileName(),
+                null,
+                null, true);
+
+        List<OverlayObj> overlayObjList = new ArrayList<>();
+        overlayObjList.add(overlayObj);
+
+        List<BaseObj> baseObjList = new ArrayList<>();
+        baseObjList.add(baseObj);
+        SceneObj sceneObj = new SceneObj("dummySceneID-" + CommonAppUtils.generateUuid(), overlayObjList, baseObjList);
+        sceneObjList.add(sceneObj);
+
+
+        AppDatabase db = AppDatabase.getInstance(getActivity().getApplicationContext());
+        UserDao userDao = db.userDao();
+        userDao.insertAll(LocalData.curUser);
+        CommonAppUtils.setDefaultProject();
+    }
+
+    private PostSignedLinkDM _getRequestBody() {
 
         ArrayList<ProjectObj> projects = LocalData.curUser.getProjects();
 
@@ -202,7 +256,7 @@ public class UploadFragment extends Fragment {
         }
         if (firstProject == null) {
             Log.e(TAG, "FIRST PROJECT NOT FOUND");
-            return "";
+            return null;
         }
 
         Uri baseUri = Uri.parse(targetImageURIString);
@@ -217,6 +271,19 @@ public class UploadFragment extends Fragment {
 
 
         try {
+
+            PostSignedLinkDM postSignedLinkDMObj = new PostSignedLinkDM();
+
+            postSignedLinkDMObj.setProjectId(projectId);
+            UploadFileDetails baseFileDetails = new UploadFileDetails(baseFileName, baseFileExtn, baseFileSize, baseUri);
+            postSignedLinkDMObj.setBase(baseFileDetails);
+
+
+            UploadFileDetails overlayFileDetails = new UploadFileDetails(overlayFileName, overlayFileExtn, overlayFileSize, overlayUri);
+            postSignedLinkDMObj.setOverlay(overlayFileDetails);
+            return postSignedLinkDMObj;
+
+/*
             JSONObject reqBody = new JSONObject();
             JSONObject baseOptions = new JSONObject();
             JSONObject overlayOptions = new JSONObject();
@@ -234,11 +301,11 @@ public class UploadFragment extends Fragment {
             reqBody.put("base", baseOptions);
             reqBody.put("overlay", overlayOptions);
             reqBody.put("projectId", projectId);
-            return reqBody.toString();
-
+            return reqBody;
+*/
         } catch (Exception e) {
             e.printStackTrace();
-            return "";
+            return null;
         }
 
     }

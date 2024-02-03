@@ -32,7 +32,7 @@ import androidx.fragment.app.Fragment;
 import com.ps.realize.R;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentCreateAddVideoBinding;
-import com.ps.realize.ui.upload.UploadFragment;
+import com.ps.realize.ui.dashboard.upload.UploadFragment;
 import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.KeyboardUtils;

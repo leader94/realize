@@ -32,8 +32,13 @@ android {
 }
 
 dependencies {
-    implementation "net.gotev:uploadservice:4.7.0"
+    def room_version = "2.5.2"
+
+//    implementation "net.gotev:uploadservice:4.7.0"
     implementation "net.gotev:uploadservice-okhttp:4.7.0"
+
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
 
 
     implementation "com.google.android.filament:filamat-android:1.21.1"

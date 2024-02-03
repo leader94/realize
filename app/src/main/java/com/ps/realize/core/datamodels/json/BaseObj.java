@@ -7,14 +7,24 @@ public class BaseObj {
     private final String originalName;
     private final String originalExtn;
     private final String uploadUrl;
+    private boolean uploadPending;
 
-    public BaseObj(String id, String fileName, String localPath, String originalName, String originalExtn, String uploadUrl) {
+    public BaseObj(String id, String fileName, String localPath, String originalName, String originalExtn, String uploadUrl, boolean uploadPending) {
         this.id = id;
         this.fileName = fileName;
         this.localPath = localPath;
         this.originalName = originalName;
         this.originalExtn = originalExtn;
         this.uploadUrl = uploadUrl;
+        this.uploadPending = uploadPending;
+    }
+
+    public boolean isUploadPending() {
+        return uploadPending;
+    }
+
+    public void setUploadPending(boolean uploadPending) {
+        this.uploadPending = uploadPending;
     }
 
     public String getId() {

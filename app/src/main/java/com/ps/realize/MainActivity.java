@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.ar.core.ArCoreApk;
 import com.google.gson.Gson;
+import com.ps.realize.core.daos.user.UserDao;
 import com.ps.realize.core.data.LocalData;
 import com.ps.realize.core.datamodels.User;
 import com.ps.realize.core.interfaces.IOnBackPressed;
@@ -22,6 +23,7 @@ import com.ps.realize.ui.dashboard.DashboardFragment;
 import com.ps.realize.utils.CommonAppUtils;
 import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.NetworkUtils;
+import com.ps.realize.utils.PreferencesUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,7 +35,7 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
     private final int REQUEST_CAMERA_CODE = 100;
-    
+
 
     private ActivityMainBinding binding;
     private User user;
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+        // getSupportActionBar().hide();
         self = this;
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -55,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
         checkARSupport();
         addPermissions();
 
-        getConfiguration();
+        startAsyncWork();
+
 
         FragmentUtils.addFragment(self, R.id.main_fragment_holder, new DashboardFragment(), DashboardFragment.class.getSimpleName());
 
@@ -97,13 +100,44 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void startAsyncWork() {
+        new Thread(new Runnable() {
+            public void run() {
+                // do something here
+                getConfiguration();
+            }
+        }).start();
+
+    }
+
     private void getConfiguration() {
+
+
         try {
+            String userId = PreferencesUtils.getUserId(getMainActivity());
+            User user = null;
+            String token = "";
+            if (userId != null) {
+                AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+                UserDao userDao = db.userDao();
+                user = userDao.getUserById(userId);
+            }
+            if (user != null) {
+                LocalData.curUser = user;
+                LocalData.curUser.setToken(user.getToken());
+                CommonAppUtils.setDefaultProject();
+
+                token = user.getToken();
+            } else {
+                userId = NetworkUtils.userId;
+                token = NetworkUtils.authToken;
+            }
+
+
             Map<String, String> queryParams = new HashMap<>();
             queryParams.put("details", "true");
-
-            NetworkUtils.getWithToken("/users/74f28839-64db-4e2f-ad54-9647b380894d", queryParams,
-                    NetworkUtils.authToken,
+            NetworkUtils.getWithToken("/users/" + userId, queryParams,
+                    token,
                     new NetworkListener() {
                         @Override
                         public void onFailure(Request request, IOException e) {
@@ -112,15 +146,18 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void onResponse(Response response) {
-//                            JSONObject userJSON = JSONUtils.getJSONObject(response);
-
                             try {
                                 String userJSONStr = response.body().string();
                                 if (userJSONStr == null) return;
                                 Gson gson = new Gson();
                                 User user = gson.fromJson(userJSONStr, User.class);
                                 LocalData.curUser = user;
-                                LocalData.curUser.setToken(NetworkUtils.authToken);
+                                LocalData.curUser.setToken(user.getToken());
+
+                                PreferencesUtils.setUserId(getMainActivity(), user.getId());
+                                AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+                                UserDao userDao = db.userDao();
+                                userDao.insertAll(user);
                                 CommonAppUtils.setDefaultProject();
                             } catch (Exception e) {
                                 e.printStackTrace();
