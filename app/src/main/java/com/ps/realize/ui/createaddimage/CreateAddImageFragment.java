@@ -32,6 +32,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.ps.realize.MyApp;
 import com.ps.realize.R;
 import com.ps.realize.core.interfaces.IOnBackPressed;
 import com.ps.realize.databinding.FragmentCreateAddImageBinding;
@@ -80,7 +81,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
 
         if (savedInstanceState != null) {
             // Restore last state for target image.
-            String imageUriString = savedInstanceState.getString(constants.TARGET_IMAGE_URI, null);
+            String imageUriString = savedInstanceState.getString(Constants.TARGET_IMAGE_URI, null);
             if (imageUriString != null) {
                 setImageIntoImageView(Uri.parse(imageUriString));
             }
@@ -93,7 +94,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(constants.TARGET_IMAGE_URI, targetImageURIString);
+        outState.putString(Constants.TARGET_IMAGE_URI, targetImageURIString);
     }
 
     @Override
@@ -116,7 +117,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
                 createAddImageLL.setVisibility(View.GONE);
                 targetImageView.setVisibility(View.VISIBLE);
                 tvNextBtn.setVisibility(View.VISIBLE);
-                Uri localImageUri = SharedMediaUtils.writeImageFile(getContext(), resource.getBitmap());
+                Uri localImageUri = SharedMediaUtils.writeImageFile(MyApp.getContext(), resource.getBitmap());
                 if (NetworkUtils.isValidUrl(model.toString())) {
                     targetImageURIString = String.valueOf(localImageUri);
                 }
@@ -152,7 +153,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
                 // TODO store the path of image;
                 CreateAddVideoFragment frag = new CreateAddVideoFragment();
                 Bundle args = new Bundle();
-                args.putString(constants.TARGET_IMAGE_URI, targetImageURIString);
+                args.putString(Constants.TARGET_IMAGE_URI, targetImageURIString);
                 frag.setArguments(args);
                 FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
                         R.id.main_fragment_holder,
@@ -165,7 +166,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
             @Override
             public void onClick(View view) {
 //                imageFromCameraActivity.launch( getTempCameraImageUri());
-                cameraPhotoUri = SharedMediaUtils.createImageFile(getContext());
+                cameraPhotoUri = SharedMediaUtils.createImageFile(MyApp.getContext());
                 imageFromCameraActivity.launch(cameraPhotoUri);
             }
         });

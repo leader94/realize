@@ -6,28 +6,30 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.ar.core.ArCoreApk;
+import com.google.ar.core.AugmentedImage;
+import com.google.ar.core.TrackingState;
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException;
 import com.ps.realize.R;
-import com.ps.realize.core.data.LocalData;
+import com.ps.realize.core.components.CircleView;
 import com.ps.realize.core.datamodels.ar.ImageMapping;
-import com.ps.realize.core.datamodels.ar.ImageObj;
-import com.ps.realize.core.datamodels.ar.VideoObj;
-import com.ps.realize.core.datamodels.json.BaseObj;
-import com.ps.realize.core.datamodels.json.OverlayObj;
-import com.ps.realize.core.datamodels.json.ProjectObj;
-import com.ps.realize.core.datamodels.json.SceneObj;
+import com.ps.realize.core.helperClasses.SceneFragmentHelper;
 import com.ps.realize.databinding.FragmentScanBinding;
+import com.ps.realize.ui.dashboard.DashboardFragment;
+import com.ps.realize.utils.ARUtils;
+import com.ps.realize.utils.Config;
 import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.JSONUtils;
+import com.ps.realize.utils.KeyboardUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 // TODO remove view from this fragment and convert it to a wrapper that handles only logics and does not have a view
@@ -37,10 +39,12 @@ import java.util.List;
  */
 public class SceneFragment extends Fragment {
     private static final String TAG = SceneFragment.class.getSimpleName();
-    private final Constants constants = new Constants();
+    private final int totalImageMappingsCount = 0;
     MyARFragment myARFragment;
+    private Fragment _this;
     private FragmentScanBinding binding;
     private boolean mUserRequestedInstall = true;
+    private CircleView arImageDetectedStatusCV;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,6 +59,7 @@ public class SceneFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        _this = this;
     }
 
     @Nullable
@@ -72,21 +77,23 @@ public class SceneFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.i(TAG, "inside onViewCreated");
+//        Glide.with(this).load("https://media.tenor.com/eSc2KWdhZPMAAAAj/parrot-party.gif").into(binding.sceneFragmentLoaderIV);
         checkARInstalled();
         if (FragmentUtils.bARSupported && FragmentUtils.bARInstalled) {
-            myARFragment = new MyARFragment();
-            List<ImageMapping> imageMappingList = getImageMappings();
+            if (myARFragment == null) {
+                myARFragment = new MyARFragment();
+            }
+            List<ImageMapping> imageMappingList = SceneFragmentHelper.getImageMappings();
             if (imageMappingList != null) {
                 String imageMappingListJSONString = JSONUtils.getGsonParser().toJson(imageMappingList);
                 Bundle args = new Bundle();
-                args.putString(constants.IMAGE_MAPPING_LIST, imageMappingListJSONString);
+                args.putString(Constants.IMAGE_MAPPING_LIST, imageMappingListJSONString);
                 myARFragment.setArguments(args);
             }
             getChildFragmentManager().beginTransaction().add(R.id.arFragmentHolder, myARFragment).commit();
         }
 
         initialise(view);
-
 
     }
 
@@ -135,39 +142,68 @@ public class SceneFragment extends Fragment {
     }
 
     void initialiseViewsItems(View view) {
+        ImageView backBtn = binding.arFragmentBackBtn;
+        arImageDetectedStatusCV = binding.fragmentSceneStatusCircleView;
+        arImageDetectedStatusCV.setColor(getResources().getColor(R.color.grey));
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Config.allowARSceneBackgroundLoad) {
+                    // set pixel size 0
+                    ARUtils.hideSceneFragment();
+                    // add DashboardFragment
+                    FragmentUtils.addFragment((AppCompatActivity) getActivity(), R.id.main_fragment_holder, new DashboardFragment(), DashboardFragment.class.getSimpleName());
+                } else {
+                    // back press
+                    KeyboardUtils.backPress(_this);
+                }
+            }
+        });
+    }
+
+
+    private void showARFragment() {
+//        binding.sceneFragmentLoaderIV.setVisibility(View.GONE);
+//        binding.sceneFragmentLL.setVisibility(View.GONE);
+
+        ViewGroup.LayoutParams layoutParams = binding.arFragmentHolder.getLayoutParams();
+
+        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+
+        binding.arFragmentHolder.setLayoutParams(layoutParams);
 
     }
 
-    List<ImageMapping> getImageMappings() {
 
-        List<ImageMapping> imageMappingList = new ArrayList();
-        ProjectObj project = LocalData.curProject;
+    public void onAugmentedImageUpdateListener(AugmentedImage augmentedImage) {
+        AugmentedImage.TrackingMethod trackingMethod = augmentedImage.getTrackingMethod();
+        TrackingState trackingState = augmentedImage.getTrackingState();
 
-        try {
-            List<SceneObj> scenes = project.getScenes();
-            scenes.forEach((scene) -> {
-                OverlayObj overlayObj = scene.getOverlays().get(0);
-                BaseObj baseObj = scene.getBases().get(0);
-                ImageObj image = new ImageObj(baseObj.getId(),
-                        baseObj.getUploadUrl() + "/" + baseObj.getFileName(),
-                        baseObj.getLocalPath());
-                VideoObj video = new VideoObj(overlayObj.getId(),
-                        overlayObj.getUploadUrl() + "/" + overlayObj.getFileName(),
-                        overlayObj.getLocalPath());
-                List<VideoObj> videoList = new ArrayList<>();
-                videoList.add(video);
-                ImageMapping imageMapping = new ImageMapping(videoList, image);
-                imageMappingList.add(imageMapping);
-                Log.i(TAG, "BBB: adding image " + image.getUrl());
-            });
-
-//            SceneObj scene = scenes.get(0);
-
-        } catch (Exception e) {
-            Log.e(TAG, " Failed getting ImageMappings ", e);
+        int color = getResources().getColor(R.color.grey);
+        switch (trackingState) {
+            case STOPPED:
+                color = getResources().getColor(R.color.black);
+                break;
+            case PAUSED:
+                if (trackingMethod == AugmentedImage.TrackingMethod.NOT_TRACKING) {
+                    color = getResources().getColor(R.color.light_orange);
+                } else if (trackingMethod == AugmentedImage.TrackingMethod.LAST_KNOWN_POSE) {
+                    color = getResources().getColor(R.color.orange);
+                }
+                break;
+            case TRACKING:
+                if (trackingMethod == AugmentedImage.TrackingMethod.LAST_KNOWN_POSE) {
+                    color = getResources().getColor(R.color.celadon);
+                } else if (trackingMethod == AugmentedImage.TrackingMethod.FULL_TRACKING) {
+                    color = getResources().getColor(R.color.neon_green);
+                }
+                break;
+            default:
+                color = getResources().getColor(R.color.grey);
         }
-        return imageMappingList;
+
+
+        arImageDetectedStatusCV.setColor(color);
     }
-
-
 }

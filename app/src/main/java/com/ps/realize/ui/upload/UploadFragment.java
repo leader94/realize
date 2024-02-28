@@ -1,4 +1,4 @@
-package com.ps.realize.ui.dashboard.upload;
+package com.ps.realize.ui.upload;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -19,10 +19,13 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.ps.realize.AppDatabase;
+import com.ps.realize.MainActivity;
+import com.ps.realize.MyApp;
 import com.ps.realize.core.daos.user.UserDao;
 import com.ps.realize.core.data.LocalData;
 import com.ps.realize.core.datamodels.api.PostSignedLinkDM;
 import com.ps.realize.core.datamodels.api.UploadFileDetails;
+import com.ps.realize.core.datamodels.ar.ImageObj;
 import com.ps.realize.core.datamodels.json.BaseObj;
 import com.ps.realize.core.datamodels.json.OverlayObj;
 import com.ps.realize.core.datamodels.json.ProjectObj;
@@ -30,6 +33,7 @@ import com.ps.realize.core.datamodels.json.SceneObj;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentUploadBinding;
 import com.ps.realize.ui.createaddimage.CreateAddImageFragment;
+import com.ps.realize.utils.ARUtils;
 import com.ps.realize.utils.CommonAppUtils;
 import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.FragmentUtils;
@@ -65,6 +69,9 @@ public class UploadFragment extends Fragment {
     private ImageView baseThumbnail, uploadedTick;
     private LinearLayout createAnother;
 
+
+    private BaseObj baseObj;
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -72,8 +79,8 @@ public class UploadFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        targetImageURIString = getArguments().getString(constants.TARGET_IMAGE_URI);
-        targetVideoURIString = getArguments().getString(constants.TARGET_VIDEO_URI);
+        targetImageURIString = getArguments().getString(Constants.TARGET_IMAGE_URI);
+        targetVideoURIString = getArguments().getString(Constants.TARGET_VIDEO_URI);
 
         binding = FragmentUploadBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -125,6 +132,8 @@ public class UploadFragment extends Fragment {
                 // handle failure and make uploadPending true
                 // save mockResponse in project scene
                 _handleUploadFailure(uploadReqBody);
+
+                _updateAIDb();
             }
 
             @Override
@@ -134,11 +143,13 @@ public class UploadFragment extends Fragment {
                     JSONObject base = resJSON.getJSONObject("base");
                     JSONObject overlay = resJSON.getJSONObject("overlay");
                     _upload(base, overlay);
+
+                    // TODO this will fail as baseObj is not updated and AIDB will not be updated,
+                    // make mechanism to add temp image into AIDB and update DB when upload is successfull
+                    _updateAIDb();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
             }
         });
 
@@ -201,6 +212,31 @@ public class UploadFragment extends Fragment {
     }
 
 
+    private void _updateAIDb() {
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+
+                addImagesToDatabase();
+            }
+        }).start();
+    }
+
+
+    private void addImagesToDatabase() {
+        ARUtils.initAugmentedImageDatabase(MainActivity.getMainActivity());
+        ImageObj imageObj = new ImageObj(baseObj.getId(),
+                baseObj.getUploadUrl() + "/" + baseObj.getFileName(),
+                baseObj.getLocalPath());
+//        ARUtils.recreateAugmentedImageDatabase(MainActivity.getMainActivity(), MyApp.getContext());
+        ARUtils.addImageToAugmentedImageDatabase(MainActivity.getMainActivity(), MyApp.getContext(), imageObj);
+
+
+    }
+
     private void _handleUploadFailure(PostSignedLinkDM uploadReqBody) {
         ProjectObj curProject = LocalData.curProject;
         List<SceneObj> sceneObjList = curProject.getScenes();
@@ -208,15 +244,8 @@ public class UploadFragment extends Fragment {
         UploadFileDetails baseDetails = uploadReqBody.getBase();
         UploadFileDetails overlayDetails = uploadReqBody.getOverlay();
 
-        BaseObj baseObj = new BaseObj("dummyBId-" + CommonAppUtils.generateUuid(),
-                baseDetails.getFileName(),
-                baseDetails.getLocalPath().toString(),
-                baseDetails.getFileName(),
-                null,
-                null,
-                true
+        updateLocalBaseObj(baseDetails);
 
-        );
         OverlayObj overlayObj = new OverlayObj("dummyOlId-" + CommonAppUtils.generateUuid(),
                 overlayDetails.getFileName(),
                 overlayDetails.getLocalPath().toString(),
@@ -233,7 +262,7 @@ public class UploadFragment extends Fragment {
         sceneObjList.add(sceneObj);
 
 
-        AppDatabase db = AppDatabase.getInstance(getActivity().getApplicationContext());
+        AppDatabase db = AppDatabase.getInstance(MainActivity.getMainActivity().getApplicationContext());
         UserDao userDao = db.userDao();
         userDao.insertAll(LocalData.curUser);
         CommonAppUtils.setDefaultProject();
@@ -352,4 +381,15 @@ public class UploadFragment extends Fragment {
         } else return 100 * (baseUploadProg + overlayUploadProg) / 200;
     }
 
+    private void updateLocalBaseObj(UploadFileDetails baseDetails) {
+        baseObj = new BaseObj("dummyBId-" + CommonAppUtils.generateUuid(),
+                baseDetails.getFileName(),
+                baseDetails.getLocalPath().toString(),
+                baseDetails.getFileName(),
+                null,
+                null,
+                true
+
+        );
+    }
 }

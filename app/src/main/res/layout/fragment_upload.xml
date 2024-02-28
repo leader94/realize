@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.dashboard.upload.UploadFragment">
+    tools:context=".ui.upload.UploadFragment">
 
     <RelativeLayout
         android:id="@+id/upload_top_bar"

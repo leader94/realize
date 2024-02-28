@@ -64,6 +64,17 @@ public class FragmentUtils {
 //        manager.popBackStack(id, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
+    public static void removeFragment(AppCompatActivity activity, String tag) {
+        FragmentManager fragmentManager = activity.getSupportFragmentManager(); // For AppCompatActivity
+        Fragment fragment = activity.getSupportFragmentManager().findFragmentByTag(tag);
+
+        if (fragment != null) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.remove(fragment);
+            fragmentTransaction.commit();
+        }
+    }
+
     public static void popAllFragments(AppCompatActivity activity) {
         FragmentManager manager = activity.getSupportFragmentManager();
         manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);

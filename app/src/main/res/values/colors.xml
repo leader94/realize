@@ -17,4 +17,13 @@
     <color name="colorSecondaryVariant">#fce2ca</color>
     <color name="colorOnSecondary">#000000</color>
 
+
+    <color name="orange">#FF7F00</color>
+    <color name="light_orange">#FFD580</color>
+
+    <color name="neon_green">#0FFF50</color>
+    <color name="celadon">#AFE1AF</color>
+    <color name="grey">#808080</color>
+
+
 </resources>

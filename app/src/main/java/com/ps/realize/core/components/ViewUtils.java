@@ -1,11 +1,13 @@
 package com.ps.realize.core.components;
 
+import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 
@@ -22,8 +24,8 @@ public class ViewUtils {
                                                         int shadowGravity) {
         float cornerRadiusValue = view.getContext().getResources().getDimension(cornerRadius);
         int elevationValue = (int) view.getContext().getResources().getDimension(elevation);
-        int shadowColorValue = ContextCompat.getColor(view.getContext(),shadowColor);
-        int backgroundColorValue = ContextCompat.getColor(view.getContext(),backgroundColor);
+        int shadowColorValue = ContextCompat.getColor(view.getContext(), shadowColor);
+        int backgroundColorValue = ContextCompat.getColor(view.getContext(), backgroundColor);
 
         float[] outerRadius = {cornerRadiusValue, cornerRadiusValue, cornerRadiusValue,
                 cornerRadiusValue, cornerRadiusValue, cornerRadiusValue, cornerRadiusValue,
@@ -45,15 +47,15 @@ public class ViewUtils {
                 DY = 0;
                 break;
             case Gravity.TOP:
-                shapeDrawablePadding.top = elevationValue*2;
+                shapeDrawablePadding.top = elevationValue * 2;
                 shapeDrawablePadding.bottom = elevationValue;
-                DY = -1*elevationValue/3;
+                DY = -1 * elevationValue / 3;
                 break;
             default:
             case Gravity.BOTTOM:
                 shapeDrawablePadding.top = elevationValue;
-                shapeDrawablePadding.bottom = elevationValue*2;
-                DY = elevationValue/3;
+                shapeDrawablePadding.bottom = elevationValue * 2;
+                DY = elevationValue / 3;
                 break;
         }
 
@@ -61,16 +63,23 @@ public class ViewUtils {
         shapeDrawable.setPadding(shapeDrawablePadding);
 
         shapeDrawable.getPaint().setColor(backgroundColorValue);
-        shapeDrawable.getPaint().setShadowLayer(cornerRadiusValue/3, 0, DY, shadowColorValue);
+        shapeDrawable.getPaint().setShadowLayer(cornerRadiusValue / 3, 0, DY, shadowColorValue);
 
         view.setLayerType(View.LAYER_TYPE_SOFTWARE, shapeDrawable.getPaint());
 
         shapeDrawable.setShape(new RoundRectShape(outerRadius, null, null));
 
         LayerDrawable drawable = new LayerDrawable(new Drawable[]{shapeDrawable});
-        drawable.setLayerInset(0, elevationValue, elevationValue*2, elevationValue, elevationValue*2);
+        drawable.setLayerInset(0, elevationValue, elevationValue * 2, elevationValue, elevationValue * 2);
 
         return drawable;
+
+    }
+
+
+    public static int getSizeInDp(Context context, int size) {
+        int sizeInDp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, size, context.getResources().getDisplayMetrics());
+        return sizeInDp;
 
     }
 }

@@ -1,11 +1,24 @@
 package com.ps.realize.utils;
 
-import android.content.Context;
+import android.Manifest;
+import android.app.Activity;
+import android.content.pm.PackageManager;
 
-import com.ps.realize.MainActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-public class permissionUtils {
-    private static final int REQUEST = 112;
+public class PermissionUtils {
+    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 98;
+
+    public static void checkReadExtPermissions(Activity activity) {
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted, request it
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        }
+    }
 //    private Context mContext = MainActivity.getMainActivity();
 
     /*public void checkWriteExternalStoragePermission( ActivityCompat activityCompat){

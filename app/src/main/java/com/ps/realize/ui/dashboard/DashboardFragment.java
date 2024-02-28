@@ -23,6 +23,9 @@ import com.ps.realize.core.interfaces.IKeyboardListener;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentDashboardBinding;
 import com.ps.realize.ui.createaddimage.CreateAddImageFragment;
+import com.ps.realize.ui.directory.DirectoryFragment;
+import com.ps.realize.utils.ARUtils;
+import com.ps.realize.utils.Config;
 import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.JSONUtils;
 import com.ps.realize.utils.KeyboardUtils;
@@ -42,7 +45,7 @@ public class DashboardFragment extends Fragment {
     private DashboardViewModel dashboardViewModel;
     private Fragment _this;
     private SearchView searchView;
-    private LinearLayout llCreateBtn;
+    private LinearLayout llCreateBtn, llDirectoryBtn;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -84,7 +87,7 @@ public class DashboardFragment extends Fragment {
         Glide.with(this).load(dashboardViewModel.getProfilePhoto()).circleCrop().into(profilePhoto);
         Glide.with(this).load(dashboardViewModel.getSuggestionLaneIV("id1_i1")).into(binding.dashboardIvId1I1);
         Glide.with(this).load(dashboardViewModel.getSuggestionLaneIV("id1_i2")).into(binding.dashboardIvId1I2);
-        Glide.with(this).load(dashboardViewModel.getSuggestionLaneIV("id2_i1")).into(binding.dashboardIvId2I1);
+//        Glide.with(this).load(dashboardViewModel.getSuggestionLaneIV("id2_i1")).into(binding.dashboardIvId2I1);
         Glide.with(this).load(dashboardViewModel.getSuggestionLaneIV("id2_i2")).into(binding.dashboardIvId2I2);
 
         searchView = binding.dashboardSvHomepageSearch;
@@ -95,6 +98,7 @@ public class DashboardFragment extends Fragment {
         });
 
         llCreateBtn = binding.dashboardLlCreateBtn;
+        llDirectoryBtn = binding.dashboardLlDirectoryBtn;
 
 
     }
@@ -104,10 +108,20 @@ public class DashboardFragment extends Fragment {
         scannerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
-                        R.id.main_fragment_holder,
-                        new SceneFragment(),
-                        SceneFragment.class.getSimpleName());
+
+                if (Config.allowARSceneBackgroundLoad) {
+                    FragmentUtils.removeFragment((
+                            AppCompatActivity) getActivity(), DashboardFragment.class.getSimpleName());
+                    ARUtils.showSceneFragment();
+                    ARUtils.ArFragmentShown();
+                } else {
+                    FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
+                            R.id.main_fragment_holder,
+                            new SceneFragment(),
+                            SceneFragment.class.getSimpleName());
+                }
+
+
             }
         });
 
@@ -118,6 +132,16 @@ public class DashboardFragment extends Fragment {
                         R.id.main_fragment_holder,
                         new CreateAddImageFragment(),
                         CreateAddImageFragment.class.getSimpleName());
+            }
+        });
+
+        llDirectoryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
+                        R.id.main_fragment_holder,
+                        new DirectoryFragment(),
+                        DirectoryFragment.class.getSimpleName());
             }
         });
     }

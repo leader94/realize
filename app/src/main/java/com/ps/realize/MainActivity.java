@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.ar.core.ArCoreApk;
 import com.google.gson.Gson;
+import com.ps.realize.core.SceneFragment;
 import com.ps.realize.core.daos.user.UserDao;
 import com.ps.realize.core.data.LocalData;
 import com.ps.realize.core.datamodels.User;
@@ -20,29 +21,31 @@ import com.ps.realize.core.interfaces.IOnBackPressed;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.ActivityMainBinding;
 import com.ps.realize.ui.dashboard.DashboardFragment;
+import com.ps.realize.utils.ARUtils;
 import com.ps.realize.utils.CommonAppUtils;
+import com.ps.realize.utils.Config;
 import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.NetworkUtils;
 import com.ps.realize.utils.PreferencesUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
+    private static AppCompatActivity self;
     private final String TAG = MainActivity.class.getSimpleName();
     private final int REQUEST_CAMERA_CODE = 100;
-
-
     private ActivityMainBinding binding;
     private User user;
-    private AppCompatActivity self;
 
-    public AppCompatActivity getMainActivity() {
-        return this;
+    public static AppCompatActivity getMainActivity() {
+        return self;
     }
 
 
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         // getSupportActionBar().hide();
         self = this;
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        LocalData.activityMainBinding = binding;
         setContentView(binding.getRoot());
 
         checkARSupport();
@@ -61,6 +65,19 @@ public class MainActivity extends AppCompatActivity {
 
 
         FragmentUtils.addFragment(self, R.id.main_fragment_holder, new DashboardFragment(), DashboardFragment.class.getSimpleName());
+
+
+        if (Config.allowARSceneBackgroundLoad) {
+
+            if (!ARUtils.loadAugmentedImageDatabaseFromFile(getMainActivity())) {
+                ARUtils.initAugmentedImageDatabase(getMainActivity());
+                ARUtils.recreateAugmentedImageDatabase(getMainActivity(), getApplicationContext());
+            }
+
+            FragmentUtils.addFragment(self, R.id.fragment_holder_for_AR, new SceneFragment(), SceneFragment.class.getSimpleName());
+
+
+        }
 
 
     }
@@ -103,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
     private void startAsyncWork() {
         new Thread(new Runnable() {
             public void run() {
-                // do something here
                 getConfiguration();
             }
         }).start();
@@ -173,12 +189,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addPermissions() {
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{
-                    Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE, Manifest.permission.POST_NOTIFICATIONS
-            }, REQUEST_CAMERA_CODE);
+        String[] permissions = new String[]{
+                Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE, Manifest.permission.POST_NOTIFICATIONS,
+                Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_AUDIO
+        };
+
+
+        List<String> permissionsToRequest = new ArrayList<>();
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(permission);
+            }
         }
 
-
+        if (!permissionsToRequest.isEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[0]), REQUEST_CAMERA_CODE);
+        } else {
+            // All permissions are already granted, proceed with the operation
+        }
     }
 }

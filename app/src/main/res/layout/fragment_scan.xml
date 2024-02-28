@@ -1,17 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:name="com.ps.realize.core.SceneFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".core.SceneFragment">
+
+
     <FrameLayout
         android:id="@+id/arFragmentHolder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:keepScreenOn="true"></FrameLayout>
+        android:layout_below="@id/ar_fragment_top_bar"
+        android:keepScreenOn="true">
 
+    </FrameLayout>
 
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/sceneFragmentLL"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:background="@color/white"-->
+    <!--        android:gravity="center_vertical"-->
+    <!--        android:orientation="vertical">-->
+
+    <!--        <ImageView-->
+    <!--            android:id="@+id/sceneFragmentLoaderIV"-->
+    <!--            android:layout_width="400px"-->
+    <!--            android:layout_height="400px"-->
+    <!--            android:layout_gravity="center_horizontal" />-->
+    <!--    </LinearLayout>-->
+
+    <RelativeLayout
+        android:id="@+id/ar_fragment_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#ffffff">
+
+        <ImageView
+            android:id="@+id/ar_fragment_back_btn"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="20dp"
+            android:padding="5dp"
+            android:src="@drawable/icon_arrow_back_rounded" />
+
+        <com.ps.realize.core.components.CircleView
+            android:id="@+id/fragment_scene_status_circle_view"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="30dp" />
+    </RelativeLayout>
+
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="20dp">-->
+
+    <!--    </LinearLayout>-->
 </RelativeLayout>

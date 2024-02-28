@@ -29,10 +29,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.ps.realize.MyApp;
 import com.ps.realize.R;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentCreateAddVideoBinding;
-import com.ps.realize.ui.dashboard.upload.UploadFragment;
+import com.ps.realize.ui.upload.UploadFragment;
 import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.KeyboardUtils;
@@ -73,7 +74,7 @@ public class CreateAddVideoFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        targetImageURIString = getArguments().getString(constants.TARGET_IMAGE_URI);
+        targetImageURIString = getArguments().getString(Constants.TARGET_IMAGE_URI);
 
         binding = FragmentCreateAddVideoBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -82,7 +83,7 @@ public class CreateAddVideoFragment extends Fragment {
 
         if (savedInstanceState != null) {
             // Restore last state for target video.
-            String videoUriString = savedInstanceState.getString(constants.TARGET_VIDEO_URI, null);
+            String videoUriString = savedInstanceState.getString(Constants.TARGET_VIDEO_URI, null);
             if (videoUriString != null) {
                 playVideo(Uri.parse(videoUriString));
             }
@@ -95,7 +96,7 @@ public class CreateAddVideoFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(constants.TARGET_VIDEO_URI, targetVideoURIString);
+        outState.putString(Constants.TARGET_VIDEO_URI, targetVideoURIString);
     }
 
     @Override
@@ -118,7 +119,7 @@ public class CreateAddVideoFragment extends Fragment {
 
         nextBtn = binding.createAddVideoNextBtn;
 
-        mediaController = new MediaController(getContext());
+        mediaController = new MediaController(MyApp.getContext());
         mediaController.setAnchorView(videoView);
 
         nextBtn.setOnClickListener(new View.OnClickListener() {
@@ -126,8 +127,8 @@ public class CreateAddVideoFragment extends Fragment {
             public void onClick(View view) {
                 UploadFragment frag = new UploadFragment();
                 Bundle args = new Bundle();
-                args.putString(constants.TARGET_IMAGE_URI, targetImageURIString);
-                args.putString(constants.TARGET_VIDEO_URI, targetVideoURIString);
+                args.putString(Constants.TARGET_IMAGE_URI, targetImageURIString);
+                args.putString(Constants.TARGET_VIDEO_URI, targetVideoURIString);
                 frag.setArguments(args);
                 FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
                         R.id.main_fragment_holder,
@@ -208,6 +209,8 @@ public class CreateAddVideoFragment extends Fragment {
 
                             try {
                                 final Uri videoUri = data.getData();
+                                MyApp.getContext().getContentResolver().takePersistableUriPermission(videoUri,
+                                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                 playVideo(videoUri);
                             } catch (Exception e) {
                                 e.printStackTrace();

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.directory.DirectoryFragment">
+
+    <RelativeLayout
+        android:id="@+id/directory_fragment_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#99a799">
+
+        <ImageView
+            android:id="@+id/directory_fragment_back_btn"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="20dp"
+            android:padding="5dp"
+            android:src="@drawable/icon_arrow_back_rounded" />
+    </RelativeLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/directory_fragment_top_bar">
+
+        <LinearLayout
+            android:id="@+id/directory_fragment_data_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:paddingBottom="20dp">
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

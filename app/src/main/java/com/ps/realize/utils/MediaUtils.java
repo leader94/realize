@@ -1,5 +1,6 @@
 package com.ps.realize.utils;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -132,7 +133,8 @@ public class MediaUtils {
         return result;
     }
 
-    public static Bitmap getBitmap(Context context, Uri imageUri) {
+    public static Bitmap getBitmap(Activity activity, Context context, Uri imageUri) {
+        PermissionUtils.checkReadExtPermissions(activity);
         Bitmap bitmap = null;
         try {
             if (Build.VERSION.SDK_INT < 28) {
@@ -146,4 +148,6 @@ public class MediaUtils {
         }
         return bitmap;
     }
+
+
 }
