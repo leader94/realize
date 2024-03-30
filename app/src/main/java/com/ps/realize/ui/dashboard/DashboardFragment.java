@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
+import com.ps.realize.MainActivity;
 import com.ps.realize.R;
 import com.ps.realize.core.SceneFragment;
 import com.ps.realize.core.data.LocalData;
@@ -112,8 +113,12 @@ public class DashboardFragment extends Fragment {
                 if (Config.allowARSceneBackgroundLoad) {
                     FragmentUtils.removeFragment((
                             AppCompatActivity) getActivity(), DashboardFragment.class.getSimpleName());
+                    if (!ARUtils.isSceneFragmentLoaded) {
+                        ARUtils.loadSceneFragment(MainActivity.getMainActivity());
+                    }
                     ARUtils.showSceneFragment();
                     ARUtils.ArFragmentShown();
+
                 } else {
                     FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
                             R.id.main_fragment_holder,
@@ -138,6 +143,7 @@ public class DashboardFragment extends Fragment {
         llDirectoryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ARUtils.removeSceneFragment(MainActivity.getMainActivity());
                 FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
                         R.id.main_fragment_holder,
                         new DirectoryFragment(),

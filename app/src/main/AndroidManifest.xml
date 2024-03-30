@@ -19,7 +19,7 @@
 
     <!--needed to read image file -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
-    
+
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -78,6 +78,9 @@ For an "AR Optional" app, specify "optional" instead of "required". -->
         <!--                android:name="android.support.FILE_PROVIDER_PATHS"-->
         <!--                android:resource="@xml/provider_paths" />-->
         <!--        </provider>-->
+
+
+        <!--        External Dependencies -->
     </application>
 
 

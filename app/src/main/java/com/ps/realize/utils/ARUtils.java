@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -17,6 +18,8 @@ import com.google.ar.core.AugmentedImageDatabase;
 import com.google.ar.core.Session;
 import com.google.ar.core.exceptions.ImageInsufficientQualityException;
 import com.ps.realize.MyApp;
+import com.ps.realize.R;
+import com.ps.realize.core.SceneFragment;
 import com.ps.realize.core.data.LocalData;
 import com.ps.realize.core.datamodels.ar.ImageMapping;
 import com.ps.realize.core.datamodels.ar.ImageObj;
@@ -33,9 +36,9 @@ public class ARUtils {
     private static final float imageSize = 0.20f;
     public static ArFragmentHelper arFragmentHelper = new ArFragmentHelper();
     public static Counter loadedImageMappingsCounter = new Counter();
+    public static boolean isSceneFragmentLoaded = false;
     private static AugmentedImageDatabase augmentedImageDatabase;
     private static int totalImageMappingsCount = 0;
-
 
     public static int getTotalImageMappingsCount() {
         return totalImageMappingsCount;
@@ -229,4 +232,14 @@ public class ARUtils {
         }
     }
 
+
+    public static void loadSceneFragment(AppCompatActivity activity) {
+        FragmentUtils.addFragment(activity, R.id.fragment_holder_for_AR, new SceneFragment(), SceneFragment.class.getSimpleName());
+        isSceneFragmentLoaded = true;
+    }
+
+    public static void removeSceneFragment(AppCompatActivity activity) {
+        FragmentUtils.removeFragment(activity, SceneFragment.class.getSimpleName());
+        isSceneFragmentLoaded = false;
+    }
 }

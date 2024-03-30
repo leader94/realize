@@ -3,6 +3,7 @@ package com.ps.realize.ui.createaddimage;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,11 +34,16 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.isseiaoki.simplecropview.CropImageView;
+import com.isseiaoki.simplecropview.callback.CropCallback;
+import com.isseiaoki.simplecropview.callback.SaveCallback;
+import com.ps.realize.MainActivity;
 import com.ps.realize.MyApp;
 import com.ps.realize.R;
 import com.ps.realize.core.interfaces.IOnBackPressed;
 import com.ps.realize.databinding.FragmentCreateAddImageBinding;
 import com.ps.realize.ui.createaddvideo.CreateAddVideoFragment;
+import com.ps.realize.utils.ARUtils;
 import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.KeyboardUtils;
@@ -58,10 +65,22 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
     private LinearLayout urlPopUp;
     private EditText etUrl;
     private LinearLayout createAddImageLL;
-    private ImageView targetImageView;
+    //    private ImageView targetImageView;
+    private CropImageView targetImageView;
     private ImageView backBtn;
     private RequestListener rlForTargetImage;
+    private RequestListener rlForFinalImage;
+
     private String targetImageURIString;
+
+    private ImageButton rotateBtn;
+    private ImageButton okBtn;
+    private ImageButton replaceImgBtn;
+
+    private  ImageView finalImageView;
+
+    private LinearLayout createAddImgLLCropView;
+    private  Uri sourceUri;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -83,10 +102,10 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
             // Restore last state for target image.
             String imageUriString = savedInstanceState.getString(Constants.TARGET_IMAGE_URI, null);
             if (imageUriString != null) {
-                setImageIntoImageView(Uri.parse(imageUriString));
+                setImage(Uri.parse(imageUriString));
             }
         } else if (targetImageURIString != null) {
-            setImageIntoImageView(Uri.parse(targetImageURIString));
+            setImage(Uri.parse(targetImageURIString));
         }
         return root;
     }
@@ -104,7 +123,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
     }
 
     private void setListeners() {
-        rlForTargetImage = new RequestListener<BitmapDrawable>() {
+        rlForFinalImage = new RequestListener<BitmapDrawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<BitmapDrawable> target, boolean isFirstResource) {
                 createAddImageLL.setVisibility(View.VISIBLE);
@@ -124,6 +143,30 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
                 return false;
             }
         };
+
+
+        rlForTargetImage = new RequestListener<BitmapDrawable>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<BitmapDrawable> target, boolean isFirstResource) {
+
+                createAddImageLL.setVisibility(View.VISIBLE);
+                targetImageView.setVisibility(View.GONE);
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(BitmapDrawable resource, Object model, Target<BitmapDrawable> target, DataSource dataSource, boolean isFirstResource) {
+                createAddImageLL.setVisibility(View.GONE);
+                createAddImgLLCropView.setVisibility(View.VISIBLE);
+//                targetImageView.setVisibility(View.VISIBLE);
+//                tvNextBtn.setVisibility(View.VISIBLE);
+                Uri localImageUri = SharedMediaUtils.writeImageFile(MyApp.getContext(), resource.getBitmap());
+                if (NetworkUtils.isValidUrl(model.toString())) {
+                    targetImageURIString = String.valueOf(localImageUri);
+                }
+                return false;
+            }
+        }
     }
 
     private void setViews() {
@@ -136,11 +179,66 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
 //        create_add_img_back_btn;
         backBtn = binding.createAddImgBackBtn;
 
+        createAddImgLLCropView = binding.createAddImgLlCropView;
+        rotateBtn = binding.createAddImgRotateBtn;
+        okBtn = binding.createAddImgOkBtn;
+        replaceImgBtn = binding.createAddImgReplaceBtn;
+
+        finalImageView= binding.finalImageView;
 
         LinearLayout llCameraImage = binding.createAddImgCamera;
         LinearLayout llLocalImage = binding.createAddImgLocal;
         LinearLayout llUrl = binding.createAddImgUrl;
 
+        rotateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        SaveCallback mSaveCallback = new SaveCallback() {
+            @Override
+            public void onSuccess(Uri uri) {
+                createAddImgLLCropView.setVisibility(View.INVISIBLE);
+                Glide.with(_this)
+                        .load(uri)
+                        .listener(rlForFinalImage)
+                        .into(finalImageView);
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+        }
+        okBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                targetImageView.crop(sourceUri)
+                        .execute(new CropCallback() {
+                            @Override
+                            public void onSuccess(Bitmap cropped) {
+
+                                Uri destinationUri = SharedMediaUtils.createImageFile(MyApp.getContext());
+                                targetImageView.save(cropped)
+                                        .execute(destinationUri, mSaveCallback);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                            }
+                        });
+            }
+        });
+
+        replaceImgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -189,7 +287,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String text = String.valueOf(etUrl.getText());
                     urlPopUp.setVisibility(View.GONE);
-                    setImageIntoImageView(Uri.parse(text));
+                    handlePostImageCapture(Uri.parse(text));
                     return false;  // Intentional to let the soft keyboard close
                 }
                 return false;
@@ -208,7 +306,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
             @Override
             public void onActivityResult(Boolean success) {
                 if (success) {
-                    setImageIntoImageView(cameraPhotoUri);
+                    handlePostImageCapture(cameraPhotoUri);
                 } else {
                     Log.e(TAG, "Error retriving image from camera activity");
                 }
@@ -227,7 +325,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
                                 final Uri imageUri = data.getData();
 //                                final InputStream imageStream = getContext().getContentResolver().openInputStream(imageUri);
 //                                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                                setImageIntoImageView(imageUri);
+                                handlePostImageCapture(imageUri);
                             } catch (Exception e) {
                                 e.printStackTrace();
 
@@ -237,17 +335,35 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
                 });
     }
 
-    private void setImageIntoImageView(Uri imageUri) {
+    private void handlePostImageCapture(Uri imageUri) {
+        sourceUri = imageUri;
+        startCropRotateActivity();
+//        setImage(imageUri);
+    }
+
+    private void setImage(Uri imageUri) {
+
+
         targetImageView.setVisibility(View.VISIBLE);
         targetImageURIString = String.valueOf(imageUri);
         Glide.with(_this)
                 .load(imageUri)
                 .listener(rlForTargetImage)
                 .into(targetImageView);
-
-
     }
 
+
+    private void startCropRotateActivity() {
+        createAddImgLLCropView.setVisibility(View.VISIBLE);
+        Glide.with(_this)
+                .load(sourceUri)
+                .listener(rlForTargetImage)
+                .into(targetImageView);
+
+
+        ARUtils.removeSceneFragment(MainActivity.getMainActivity());
+
+    }
 
 
     /*

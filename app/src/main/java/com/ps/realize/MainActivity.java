@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.ar.core.ArCoreApk;
 import com.google.gson.Gson;
-import com.ps.realize.core.SceneFragment;
+import com.ps.realize.core.MyARFragment;
 import com.ps.realize.core.daos.user.UserDao;
 import com.ps.realize.core.data.LocalData;
 import com.ps.realize.core.datamodels.User;
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "On create called");
         // getSupportActionBar().hide();
         self = this;
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -74,9 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 ARUtils.recreateAugmentedImageDatabase(getMainActivity(), getApplicationContext());
             }
 
-            FragmentUtils.addFragment(self, R.id.fragment_holder_for_AR, new SceneFragment(), SceneFragment.class.getSimpleName());
-
-
+            ARUtils.loadSceneFragment(self);
         }
 
 
@@ -207,5 +206,27 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // All permissions are already granted, proceed with the operation
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(TAG, "On pause called");
+        MyARFragment.pauseARCoreSession();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(TAG, "On resume called");
+        MyARFragment.resumeARCoreSession();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "On destroy called");
+        MyARFragment.destroyArCoreSession();
+
     }
 }

@@ -5,7 +5,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.opengl.EGL14;
+import android.opengl.EGLContext;
+import android.opengl.EGLDisplay;
+import android.opengl.EGLSurface;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +31,7 @@ import com.google.ar.core.Config;
 import com.google.ar.core.Session;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.math.Quaternion;
@@ -72,8 +78,12 @@ import java.util.concurrent.CompletableFuture;
 public class MyARFragment extends ArFragment implements BaseArFragment.OnSessionConfigurationListener, ICounterListener, IArFragmentListener {
     private static final String TAG = MyARFragment.class.getSimpleName();
     private static Session arSession;
+    private static EGLContext savedContext;
+    private static EGLDisplay savedDisplay;
+    private static EGLSurface savedReadSurface;
+    private static EGLSurface savedDrawSurface;
+    private static ArSceneView arSceneView;
     private final List<CompletableFuture<Void>> futures = new ArrayList<>();
-    private final Constants constants = new Constants();
     private final Map<String, MapDetails> _map = new HashMap<>();
     SceneFragment parentFragment;
     private Config arConfig;
@@ -84,6 +94,7 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
 
     public static void pauseARCoreSession() {
         try {
+            saveEGLContext();
             if (arSession != null) {
                 arSession.pause();
             }
@@ -95,6 +106,7 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
 
     public static void resumeARCoreSession() {
         try {
+            restoreEGLContext();
             if (arSession != null) {
                 arSession.resume();
             }
@@ -104,9 +116,62 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
 
     }
 
+    public static void destroyArCoreSession() {
+        if (arSceneView != null && arSceneView.getRenderer() != null) {
+            arSceneView.getRenderer().dispose();
+        }
+
+        // Release AR session resources
+        if (arSession != null) {
+            arSession.close();
+            arSession = null;
+        }
+    }
+
+    private static void restoreEGLContext() {
+//        return;
+        if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+            throw new IllegalStateException("restoreEglContext called from non-UI thread");
+        }
+        Log.d(TAG, "Restoring EGL context");
+        if (savedContext != null && savedContext != EGL14.EGL_NO_CONTEXT) {
+            if (!EGL14.eglMakeCurrent(savedDisplay, savedDrawSurface, savedReadSurface, savedContext)) {
+                Log.d(TAG, "Failed to restore");
+            }
+        } else {
+            Log.d(TAG, "Nothing to restore");
+        }
+    }
+
+    private static void saveEGLContext() {
+//        return;
+
+        if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+            throw new IllegalStateException("saveEglContext called from non-UI thread");
+        }
+        Log.d(TAG, "Saving EGL context");
+        EGLContext currentContext = EGL14.eglGetCurrentContext();
+        if (currentContext == null || currentContext == EGL14.EGL_NO_CONTEXT) {
+            Log.d(TAG, "Nothing to save");
+        } else {
+            savedContext = currentContext;
+            savedDisplay = EGL14.eglGetCurrentDisplay();
+            savedDrawSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
+            savedReadSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_READ);
+            EGL14.eglMakeCurrent(
+                    savedDisplay,
+                    EGL14.EGL_NO_SURFACE,
+                    EGL14.EGL_NO_SURFACE,
+                    EGL14.EGL_NO_CONTEXT
+            );
+        }
+
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        restoreEGLContext();
     }
 
     @Override
@@ -116,6 +181,8 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
 
         ARUtils.loadedImageMappingsCounter.addListener(this);
         ARUtils.arFragmentHelper.addListener(this);
+
+        arSceneView = getArSceneView();
     }
 
     @Override
@@ -189,11 +256,13 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
     @Override
     public void onDetach() {
         super.onDetach();
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        pauseARCoreSession();
     }
 
     @Override
@@ -221,6 +290,22 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
                 value.exoPlayer.release();
             }
         });
+
+        Log.i(TAG, "Ondestry called");
+        destroyArCoreSession();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        resumeARCoreSession();
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        Log.i(TAG, "destoy called");
+        destroyArCoreSession();
     }
 
     @Override
@@ -232,9 +317,13 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
 
 
         try {
-            session.resume();
-            session.pause();
-            session.resume();
+            resumeARCoreSession();
+            pauseARCoreSession();
+            resumeARCoreSession();
+
+//            session.resume();
+//            session.pause();
+//            session.resume();
         } catch (Exception e) {
             Log.e(TAG, "Error while resume and pausing session", e);
         }
@@ -566,7 +655,9 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
     private void reloadAiDB() {
         arConfig.setAugmentedImageDatabase(ARUtils.getAugmentedImageDatabase(MainActivity.getMainActivity()));
 //        this.config.setUpdateMode(Config.UpdateMode.LATEST_CAMERA_IMAGE);
-        arSession.configure(arConfig);
+        if (arSession != null) {
+            arSession.configure(arConfig);
+        }
         setOnAugmentedImageUpdateListener(MyARFragment.this::onAugmentedImageTrackingUpdate);
     }
 
