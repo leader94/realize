@@ -77,10 +77,10 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
     private ImageButton okBtn;
     private ImageButton replaceImgBtn;
 
-    private  ImageView finalImageView;
+    private ImageView finalImageView;
 
     private LinearLayout createAddImgLLCropView;
-    private  Uri sourceUri;
+    private Uri sourceUri;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -166,7 +166,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
                 }
                 return false;
             }
-        }
+        };
     }
 
     private void setViews() {
@@ -184,7 +184,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
         okBtn = binding.createAddImgOkBtn;
         replaceImgBtn = binding.createAddImgReplaceBtn;
 
-        finalImageView= binding.finalImageView;
+        finalImageView = binding.finalImageView;
 
         LinearLayout llCameraImage = binding.createAddImgCamera;
         LinearLayout llLocalImage = binding.createAddImgLocal;
@@ -212,7 +212,7 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed {
             public void onError(Throwable e) {
 
             }
-        }
+        };
         okBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
