@@ -5,7 +5,9 @@ public interface CallbackListener {
 //    void onCallbackWithData(String data);
     void onSuccess();
 
-    void onSucessWithData();
+    default void onSucessWithData() {
+
+    }
 
     //
     void onFailure();

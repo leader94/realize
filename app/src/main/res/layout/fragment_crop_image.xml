@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.cropImage.CropImageFragment">
+
+    <!--    top bar-->
+    <RelativeLayout
+        android:id="@+id/create_add_img_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#99a799">
+
+        <ImageView
+            android:id="@+id/cif_iv_back_btn"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="20dp"
+            android:padding="5dp"
+            android:src="@drawable/icon_arrow_back_rounded" />
+
+    </RelativeLayout>
+
+
+    <!--        Crop View-->
+    <com.isseiaoki.simplecropview.CropImageView xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/crop_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/create_add_img_top_bar"
+        android:layout_marginBottom="40dp"
+        android:gravity="center"
+        android:paddingLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="16dp"
+        custom:scv_crop_mode="fit_image" />
+
+
+    <LinearLayout
+        android:id="@+id/create_add_img_ll_crop_bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="2dp"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <ImageButton
+            android:id="@+id/create_add_img_rotate_btn"
+            android:layout_width="42dp"
+            android:layout_height="68dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_rotate_right" />
+
+        <ImageButton
+            android:id="@+id/create_add_img_ok_btn"
+            android:layout_width="42dp"
+            android:layout_height="68dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_check_filled" />
+    </LinearLayout>
+
+</RelativeLayout>

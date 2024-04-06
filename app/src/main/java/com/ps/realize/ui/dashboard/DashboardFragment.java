@@ -133,6 +133,7 @@ public class DashboardFragment extends Fragment {
         llCreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ARUtils.removeSceneFragment(MainActivity.getMainActivity());
                 FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
                         R.id.main_fragment_holder,
                         new CreateAddImageFragment(),

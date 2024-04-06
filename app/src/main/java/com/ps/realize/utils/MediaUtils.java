@@ -2,6 +2,7 @@ package com.ps.realize.utils;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -9,20 +10,31 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.content.FileProvider;
 
+import com.ps.realize.core.interfaces.CallbackListener;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MediaUtils {
+
+    private static final String TAG = MediaUtils.class.getSimpleName();
 
     public static String getMimeType(Context context, Uri uri) {
         String extension;
@@ -149,5 +161,54 @@ public class MediaUtils {
         return bitmap;
     }
 
+    public static void copyImage(Context context, Uri sourceUri, Uri destinationUri, CallbackListener callbackListener) {
+        AsyncTask.execute(() -> {
+            try {
+                ContentResolver resolver = context.getContentResolver();
+
+                // Open an input stream from the source URI
+                InputStream inputStream = resolver.openInputStream(sourceUri);
+                if (inputStream == null) {
+                    return;
+                }
+
+                // Open an output stream to the destination URI
+                OutputStream outputStream = resolver.openOutputStream(destinationUri);
+                if (outputStream == null) {
+                    inputStream.close();
+                    return;
+                }
+
+                // Copy the data from the input stream to the output stream
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+                    bufferedOutputStream.write(buffer, 0, bytesRead);
+                }
+
+                // Close streams
+                bufferedInputStream.close();
+                bufferedOutputStream.close();
+
+                // Optionally, you may want to update the MediaStore to reflect the new image
+                updateMediaStore(context, destinationUri);
+
+            } catch (IOException e) {
+                Log.e(TAG, "Error copying image", e);
+                callbackListener.onFailure();
+            }
+            callbackListener.onSuccess();
+        });
+    }
+
+
+    private static void updateMediaStore(Context context, Uri uri) {
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.IS_PENDING, 0);
+        resolver.update(uri, values, null, null);
+    }
 
 }

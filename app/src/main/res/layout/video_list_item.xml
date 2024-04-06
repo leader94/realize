@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><!-- video_thumbnail_item.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/video_list_ll"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/thumbnail_image"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="15dp"
+        android:scaleType="centerCrop" />
+
+    <!--    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView-->
+    <!--        android:id="@+id/youtube_player_view"-->
+    <!--        android:layout_width="200dp"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="15dp"-->
+    <!--        android:visibility="gone" />-->
+
+    <TextView
+        android:id="@+id/youtube_video_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:fontFamily="sans-serif"
+        android:textColor="#000"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

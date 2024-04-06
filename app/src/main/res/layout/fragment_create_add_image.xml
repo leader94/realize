@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.createaddimage.CreateAddImageFragment">
 
+    <!--    top bar-->
     <RelativeLayout
         android:id="@+id/create_add_img_top_bar"
         android:layout_width="match_parent"
@@ -40,6 +41,7 @@
             />
     </RelativeLayout>
 
+    <!--    start image view -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -92,70 +94,8 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/create_add_img_ll_crop_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/create_add_img_top_bar"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="98dp"
-        android:background="#fefaf5"
-        android:gravity="center"
-        android:orientation="vertical">
 
-        <com.isseiaoki.simplecropview.CropImageView xmlns:custom="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/target_image_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="40dp"
-            android:layout_weight="1"
-            android:paddingLeft="16dp"
-            android:paddingTop="16dp"
-            android:paddingRight="16dp"
-            android:paddingBottom="16dp"
-            android:visibility="gone"
-            custom:scv_crop_mode="fit_image" />
-
-        <LinearLayout
-            android:id="@+id/create_add_img_ll_crop_bottom_bar"
-            android:layout_width="322dp"
-            android:layout_height="68dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/rect_bottom_curved"
-            android:orientation="horizontal"
-            android:weightSum="2">
-
-            <ImageButton
-                android:id="@+id/create_add_img_rotate_btn"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_weight="1"
-                android:padding="5dp"
-                android:src="@drawable/icon_rotate_right" />
-
-            <ImageButton
-                android:id="@+id/create_add_img_ok_btn"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_weight="1"
-                android:padding="5dp"
-                android:src="@drawable/icon_check_filled" />
-
-            <ImageButton
-                android:id="@+id/create_add_img_replace_btn"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_weight="1"
-                android:padding="5dp"
-                android:src="@drawable/icon_add_image" />
-        </LinearLayout>
-    </LinearLayout>
-
-
+    <!-- add image bottom bar-->
     <LinearLayout
         android:id="@+id/create_add_img_rl_bottom_bar"
         android:layout_width="322dp"
@@ -165,7 +105,8 @@
         android:layout_marginBottom="12dp"
         android:background="@drawable/rect_bottom_curved"
         android:orientation="horizontal"
-        android:weightSum="4">
+        android:visibility="invisible"
+        android:weightSum="3">
 
         <LinearLayout
             android:id="@+id/create_add_img_camera"
@@ -190,6 +131,7 @@
                 android:textSize="12sp"
                 android:textStyle="normal" />
         </LinearLayout>
+
 
         <LinearLayout
             android:id="@+id/create_add_img_local"
@@ -241,33 +183,58 @@
                 android:textStyle="normal" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/create_add_img_search"
-            android:layout_width="0dp"
-            android:layout_height="68dp"
-            android:layout_centerVertical="true"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+        <!--        <LinearLayout-->
+        <!--            android:id="@+id/create_add_img_search"-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="68dp"-->
+        <!--            android:layout_centerVertical="true"-->
+        <!--            android:layout_weight="1"-->
+        <!--            android:gravity="center"-->
+        <!--            android:orientation="vertical">-->
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/icon_search_rounded"
-                android:textColor="#000" />
+        <!--            <ImageView-->
+        <!--                android:layout_width="24dp"-->
+        <!--                android:layout_height="24dp"-->
+        <!--                android:src="@drawable/icon_search_rounded"-->
+        <!--                android:textColor="#000" />-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="Search"
-                android:textColor="#000000"
-                android:textSize="12sp"
-                android:textStyle="normal" />
-        </LinearLayout>
+        <!--            <TextView-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:fontFamily="sans-serif"-->
+        <!--                android:text="Search"-->
+        <!--                android:textColor="#000000"-->
+        <!--                android:textSize="12sp"-->
+        <!--                android:textStyle="normal" />-->
+        <!--        </LinearLayout>-->
 
     </LinearLayout>
 
+    <!-- add image bottom bar-->
+    <LinearLayout
+        android:id="@+id/caif_ll_btm_final_view"
+        android:layout_width="322dp"
+        android:layout_height="68dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/rect_bottom_curved"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/caif_tv_replace"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Replace"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!--    url popup view-->
     <LinearLayout
         android:id="@+id/add_image_ll_url_popup"
         android:layout_width="match_parent"

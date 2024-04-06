@@ -2,8 +2,12 @@ package com.ps.realize.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 import okhttp3.Response;
 
@@ -29,5 +33,13 @@ public class JSONUtils {
             return null;
         }
 
+    }
+
+    // Usage
+//    String jsonArray = ...
+//    List<User> user = getListFromJSONArray(jsonArray, User.class);
+    public <T> List<T> getListFromJSONArray(String jsonArray, Class<T> clazz) {
+        Type typeOfT = TypeToken.getParameterized(List.class, clazz).getType();
+        return getGsonParser().fromJson(jsonArray, typeOfT);
     }
 }

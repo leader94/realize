@@ -34,6 +34,7 @@ import com.ps.realize.R;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentCreateAddVideoBinding;
 import com.ps.realize.ui.upload.UploadFragment;
+import com.ps.realize.ui.youtubeSearch.VideoListFragment;
 import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.FragmentUtils;
 import com.ps.realize.utils.KeyboardUtils;
@@ -109,6 +110,7 @@ public class CreateAddVideoFragment extends Fragment {
         LinearLayout llCameraVideo = binding.createAddVideoCamera;
         LinearLayout llLocalVideo = binding.createAddVideoLocal;
         LinearLayout llUrl = binding.createAddVideoUrl;
+        LinearLayout llSearch = binding.createAddVideoSearch;
         llCenter = binding.createAddVideoCenterLl;
         urlPopUp = binding.createAddVideoUrlPopup;
         etUrl = binding.createAddVideoUrlEdittext;
@@ -180,6 +182,17 @@ public class CreateAddVideoFragment extends Fragment {
                     return false;  // Intentional to let the soft keyboard close
                 }
                 return false;
+            }
+        });
+
+        llSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                VideoListFragment videoListFragment = new VideoListFragment();
+                FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
+                        R.id.main_fragment_holder,
+                        new VideoListFragment(),
+                        VideoListFragment.class.getSimpleName());
             }
         });
     }
@@ -291,6 +304,9 @@ public class CreateAddVideoFragment extends Fragment {
         });
 
     }
+
+
+
     /*
     private Uri getTempCameraVideoUri() {
         File imagePath = null;
