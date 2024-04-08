@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.sceneFinalize.SceneFinalizeFragment">
+
+
+    <!--    wallpaper-->
+    <ImageView
+        android:layout_width="450dp"
+        android:layout_height="700dp"
+        android:layout_below="@id/sff_rl_top_bar"
+        android:scaleType="fitXY"
+        android:src="@drawable/wall_2" />
+
+    <!--    target image view-->
+    <ImageView
+        android:id="@+id/sff_taget_image_view"
+        android:layout_width="156dp"
+        android:layout_height="222dp"
+        android:layout_below="@id/sff_rl_top_bar"
+        android:layout_marginStart="98dp"
+        android:layout_marginTop="98dp"
+        android:scaleType="fitXY"
+        android:src="@color/teal_200" />
+
+    <!--    inside mobile wallpaper-->
+    <ImageView
+        android:layout_width="177dp"
+        android:layout_height="300dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="310dp"
+        android:layout_marginRight="45dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/wall_2" />
+
+    <!--    Video view-->
+    <SurfaceView
+        android:id="@+id/sff_target_video_view"
+        android:layout_width="67dp"
+        android:layout_height="103dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="355dp"
+        android:layout_marginRight="113dp" />
+
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="440dp"
+        android:layout_below="@id/sff_rl_top_bar"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="170dp"
+        android:paddingLeft="20dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/mob_frame_vertical_cropped" />
+    <!--    top bar-->
+    <RelativeLayout
+        android:id="@+id/sff_rl_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#99a799">
+
+        <ImageView
+            android:id="@+id/sff_back_btn"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="20dp"
+            android:padding="5dp"
+            android:src="@drawable/icon_arrow_back_rounded" />
+
+        <TextView
+            android:id="@+id/sff_next_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="20dp"
+            android:clickable="true"
+            android:fontFamily="sans-serif"
+            android:padding="5dp"
+            android:text="Save"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="normal"
+
+
+            />
+    </RelativeLayout>
+</RelativeLayout>

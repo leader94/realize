@@ -239,6 +239,9 @@ public class MyARFragment extends ArFragment implements BaseArFragment.OnSession
         new Thread(new Runnable() {
             @Override
             public void run() {
+                if (arSession == null) {
+                    return;
+                }
                 // Your background task
                 Log.i(TAG, "Handling loading in BG");
 

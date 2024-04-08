@@ -67,6 +67,7 @@
 
     </RelativeLayout>
 
+    <!--    add video poster-->
     <LinearLayout
         android:id="@+id/create_add_video_center_ll"
         android:layout_width="match_parent"
@@ -79,12 +80,6 @@
         android:background="#fefaf5"
         android:gravity="center"
         android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/create_add_video_target_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/create_add_video_ll_add_btn"
@@ -119,118 +114,120 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/create_add_video_rl_bottom_bar"
-        android:layout_width="322dp"
-        android:layout_height="68dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="12dp"
-        android:background="@drawable/rect_bottom_curved"
-        android:orientation="horizontal"
-        android:weightSum="4">
+    <!--    Video add options-->
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/create_add_video_rl_bottom_bar"-->
+    <!--        android:layout_width="322dp"-->
+    <!--        android:layout_height="68dp"-->
+    <!--        android:layout_alignParentBottom="true"-->
+    <!--        android:layout_centerInParent="true"-->
+    <!--        android:layout_marginBottom="12dp"-->
+    <!--        android:background="@drawable/rect_bottom_curved"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        android:weightSum="4">-->
 
-        <LinearLayout
-            android:id="@+id/create_add_video_camera"
-            android:layout_width="0dp"
-            android:layout_height="68dp"
-            android:layout_centerVertical="true"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+    <!--        <LinearLayout-->
+    <!--            android:id="@+id/create_add_video_camera"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="68dp"-->
+    <!--            android:layout_centerVertical="true"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:gravity="center"-->
+    <!--            android:orientation="vertical">-->
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/icon_camera" />
+    <!--            <ImageView-->
+    <!--                android:layout_width="24dp"-->
+    <!--                android:layout_height="24dp"-->
+    <!--                android:src="@drawable/icon_camera" />-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="Camera"
-                android:textColor="#000000"
-                android:textSize="12sp"
-                android:textStyle="normal" />
-        </LinearLayout>
+    <!--            <TextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:fontFamily="sans-serif"-->
+    <!--                android:text="Camera"-->
+    <!--                android:textColor="#000000"-->
+    <!--                android:textSize="12sp"-->
+    <!--                android:textStyle="normal" />-->
+    <!--        </LinearLayout>-->
 
-        <LinearLayout
-            android:id="@+id/create_add_video_local"
-            android:layout_width="0dp"
-            android:layout_height="68dp"
-            android:layout_centerVertical="true"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+    <!--        <LinearLayout-->
+    <!--            android:id="@+id/create_add_video_local"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="68dp"-->
+    <!--            android:layout_centerVertical="true"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:gravity="center"-->
+    <!--            android:orientation="vertical">-->
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/icon_folder"
-                android:textColor="#000" />
+    <!--            <ImageView-->
+    <!--                android:layout_width="24dp"-->
+    <!--                android:layout_height="24dp"-->
+    <!--                android:src="@drawable/icon_folder"-->
+    <!--                android:textColor="#000" />-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="Local"
-                android:textColor="#000000"
-                android:textSize="12sp"
-                android:textStyle="normal" />
-        </LinearLayout>
+    <!--            <TextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:fontFamily="sans-serif"-->
+    <!--                android:text="Local"-->
+    <!--                android:textColor="#000000"-->
+    <!--                android:textSize="12sp"-->
+    <!--                android:textStyle="normal" />-->
+    <!--        </LinearLayout>-->
 
-        <LinearLayout
-            android:id="@+id/create_add_video_url"
-            android:layout_width="0dp"
-            android:layout_height="68dp"
-            android:layout_centerVertical="true"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+    <!--        <LinearLayout-->
+    <!--            android:id="@+id/create_add_video_url"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="68dp"-->
+    <!--            android:layout_centerVertical="true"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:gravity="center"-->
+    <!--            android:orientation="vertical">-->
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/icon_link"
-                android:textColor="#000" />
+    <!--            <ImageView-->
+    <!--                android:layout_width="24dp"-->
+    <!--                android:layout_height="24dp"-->
+    <!--                android:src="@drawable/icon_link"-->
+    <!--                android:textColor="#000" />-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="URL"
-                android:textColor="#000000"
-                android:textSize="12sp"
-                android:textStyle="normal" />
-        </LinearLayout>
+    <!--            <TextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:fontFamily="sans-serif"-->
+    <!--                android:text="URL"-->
+    <!--                android:textColor="#000000"-->
+    <!--                android:textSize="12sp"-->
+    <!--                android:textStyle="normal" />-->
+    <!--        </LinearLayout>-->
 
-        <LinearLayout
-            android:id="@+id/create_add_video_search"
-            android:layout_width="0dp"
-            android:layout_height="68dp"
-            android:layout_centerVertical="true"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+    <!--        <LinearLayout-->
+    <!--            android:id="@+id/create_add_video_search"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="68dp"-->
+    <!--            android:layout_centerVertical="true"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:gravity="center"-->
+    <!--            android:orientation="vertical">-->
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/icon_search_rounded"
-                android:textColor="#000" />
+    <!--            <ImageView-->
+    <!--                android:layout_width="24dp"-->
+    <!--                android:layout_height="24dp"-->
+    <!--                android:src="@drawable/icon_search_rounded"-->
+    <!--                android:textColor="#000" />-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="Search"
-                android:textColor="#000000"
-                android:textSize="12sp"
-                android:textStyle="normal" />
-        </LinearLayout>
+    <!--            <TextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:fontFamily="sans-serif"-->
+    <!--                android:text="Search"-->
+    <!--                android:textColor="#000000"-->
+    <!--                android:textSize="12sp"-->
+    <!--                android:textStyle="normal" />-->
+    <!--        </LinearLayout>-->
 
-    </LinearLayout>
+    <!--    </LinearLayout>-->
 
+    <!--    Video add url popup-->
     <LinearLayout
         android:id="@+id/create_add_video_url_popup"
         android:layout_width="match_parent"

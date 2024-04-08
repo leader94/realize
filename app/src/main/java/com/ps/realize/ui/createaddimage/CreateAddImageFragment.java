@@ -330,8 +330,5 @@ public class CreateAddImageFragment extends Fragment implements IOnBackPressed, 
     @Override
     public void onPopBackDataRecieved(String data) {
         targetImageURIString = data;
-        setImage();
-
-
     }
 }

@@ -29,11 +29,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.ps.realize.MainActivity;
 import com.ps.realize.MyApp;
 import com.ps.realize.R;
 import com.ps.realize.core.interfaces.NetworkListener;
 import com.ps.realize.databinding.FragmentCreateAddVideoBinding;
-import com.ps.realize.ui.upload.UploadFragment;
+import com.ps.realize.ui.bottomSheet.BottomSheetFragment;
+import com.ps.realize.ui.bottomSheet.ItemTextBottomSheetItem;
+import com.ps.realize.ui.sceneFinalize.SceneFinalizeFragment;
 import com.ps.realize.ui.youtubeSearch.VideoListFragment;
 import com.ps.realize.utils.Constants;
 import com.ps.realize.utils.FragmentUtils;
@@ -44,6 +47,8 @@ import com.ps.realize.utils.SharedMediaUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -75,8 +80,11 @@ public class CreateAddVideoFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        targetImageURIString = getArguments().getString(Constants.TARGET_IMAGE_URI);
-
+        try {
+            targetImageURIString = getArguments().getString(Constants.TARGET_IMAGE_URI);
+        } catch (Exception e) {
+            Log.e(TAG, "TARGET_IMAGE_URI not found", e);
+        }
         binding = FragmentCreateAddVideoBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
@@ -107,10 +115,11 @@ public class CreateAddVideoFragment extends Fragment {
     }
 
     private void setViews() {
-        LinearLayout llCameraVideo = binding.createAddVideoCamera;
-        LinearLayout llLocalVideo = binding.createAddVideoLocal;
-        LinearLayout llUrl = binding.createAddVideoUrl;
-        LinearLayout llSearch = binding.createAddVideoSearch;
+//        LinearLayout llCameraVideo = binding.createAddVideoCamera;
+//        LinearLayout llLocalVideo = binding.createAddVideoLocal;
+//        LinearLayout llUrl = binding.createAddVideoUrl;
+//        LinearLayout llSearch = binding.createAddVideoSearch;
+        LinearLayout addVideoLLBtn = binding.createAddVideoLlAddBtn;
         llCenter = binding.createAddVideoCenterLl;
         urlPopUp = binding.createAddVideoUrlPopup;
         etUrl = binding.createAddVideoUrlEdittext;
@@ -124,10 +133,57 @@ public class CreateAddVideoFragment extends Fragment {
         mediaController = new MediaController(MyApp.getContext());
         mediaController.setAnchorView(videoView);
 
+        addVideoLLBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                int[] icons = {R.drawable.icon_camera, R.drawable.icon_facebook, R.drawable.icon_instagram}; // your icon resources
+
+                List<ItemTextBottomSheetItem> list = new ArrayList<>();
+
+
+                ItemTextBottomSheetItem cameraItem = new ItemTextBottomSheetItem(ItemTextBottomSheetItem.ICON_TEXT_BTMSHEET.CAMERA, R.drawable.icon_camera, "Camera");
+                ItemTextBottomSheetItem localItem = new ItemTextBottomSheetItem(ItemTextBottomSheetItem.ICON_TEXT_BTMSHEET.LOCAL, R.drawable.icon_folder, "Files");
+                ItemTextBottomSheetItem youtubeItem = new ItemTextBottomSheetItem(ItemTextBottomSheetItem.ICON_TEXT_BTMSHEET.YOUTUBE, R.drawable.icon_search_rounded, "Youtube");
+                ItemTextBottomSheetItem linkItem = new ItemTextBottomSheetItem(ItemTextBottomSheetItem.ICON_TEXT_BTMSHEET.LINK, R.drawable.icon_link, "Youtube");
+                list.add(cameraItem);
+                list.add(localItem);
+                list.add(youtubeItem);
+                list.add(linkItem);
+
+
+                BottomSheetFragment bottomSheetFragment = BottomSheetFragment.newInstance(list, item -> {
+                    // Handle icon click here
+                    // iconResourceId is the resource ID of the clicked icon
+                    Log.i(TAG, "inside icon view");
+                    switch (item.getId()) {
+                        case CAMERA:
+                            handleAddVideoFromCameraClick();
+                            break;
+                        case YOUTUBE:
+                            handleAddVideoFromYoutubeClick();
+                            break;
+                        case LINK:
+                            handleAddVideoFromLinkClick();
+                            break;
+                        case LOCAL:
+                            handleAddVideoFromFileClick();
+                            break;
+                        default:
+
+                    }
+
+                });
+                bottomSheetFragment.show(MainActivity.getMainActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+
+            }
+        });
+
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UploadFragment frag = new UploadFragment();
+//                UploadFragment frag = new UploadFragment();
+                SceneFinalizeFragment frag = new SceneFinalizeFragment();
                 Bundle args = new Bundle();
                 args.putString(Constants.TARGET_IMAGE_URI, targetImageURIString);
                 args.putString(Constants.TARGET_VIDEO_URI, targetVideoURIString);
@@ -147,29 +203,6 @@ public class CreateAddVideoFragment extends Fragment {
             }
         });
 
-        llCameraVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                videoFromCameraActivity.launch(getTempCameraVideoUri());
-                cameraVideoUri = SharedMediaUtils.createVideoFile(getContext());
-                videoFromCameraActivity.launch(cameraVideoUri);
-
-            }
-        });
-
-        llLocalVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MediaUtils.pickVideoFromGalleryIntent(videoFromLocalStorageActivity);
-            }
-        });
-
-        llUrl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                urlPopUp.setVisibility(View.VISIBLE);
-            }
-        });
 
         etUrl.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -185,17 +218,38 @@ public class CreateAddVideoFragment extends Fragment {
             }
         });
 
-        llSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                VideoListFragment videoListFragment = new VideoListFragment();
-                FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
-                        R.id.main_fragment_holder,
-                        new VideoListFragment(),
-                        VideoListFragment.class.getSimpleName());
-            }
-        });
     }
+
+//    private  void addVideoOnClickListeners(){
+//        llCameraVideo.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                handleAddVideoFromCameraClick();
+//            }
+//        });
+//
+//        llLocalVideo.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                handleAddVideoFromFileClick();
+//            }
+//        });
+//
+//        llUrl.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                handleAddVideoFromLinkClick();
+//            }
+//        });
+//
+//        llSearch.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                handleAddVideoFromYoutubeClick();
+//            }
+//        });
+//
+//    }
 
     private void attachActivityResultLaunchers() {
         videoFromCameraActivity = registerForActivityResult(new ActivityResultContracts.CaptureVideo(), new ActivityResultCallback<Boolean>() {
@@ -303,6 +357,29 @@ public class CreateAddVideoFragment extends Fragment {
             }
         });
 
+    }
+
+
+    private void handleAddVideoFromCameraClick() {
+        //                videoFromCameraActivity.launch(getTempCameraVideoUri());
+        cameraVideoUri = SharedMediaUtils.createVideoFile(getContext());
+        videoFromCameraActivity.launch(cameraVideoUri);
+    }
+
+    private void handleAddVideoFromYoutubeClick() {
+        VideoListFragment videoListFragment = new VideoListFragment();
+        FragmentUtils.replaceFragment((AppCompatActivity) getActivity(),
+                R.id.main_fragment_holder,
+                new VideoListFragment(),
+                VideoListFragment.class.getSimpleName());
+    }
+
+    private void handleAddVideoFromLinkClick() {
+        urlPopUp.setVisibility(View.VISIBLE);
+    }
+
+    private void handleAddVideoFromFileClick() {
+        MediaUtils.pickVideoFromGalleryIntent(videoFromLocalStorageActivity);
     }
 
 
